@@ -31,27 +31,37 @@ class Personal {
 
         try{
 
-            if(self::Verificar == true){
-                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta =$objetoAccesoDato->RetornarConsulta("
-                    update personal 
-                    set nombre=:nom,
-                        apellido=:ape,
-                        puesto=:pue
-                    WHERE  ID LIKE :id");
-                $consulta->bindValue(':ID',$id, PDO::PARAM_INT);
-                $consulta->bindValue(':nom',$nom, PDO::PARAM_STR);
-                $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
-                $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
-        
-                if($consulta->execute() == true)
-                    return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
-                else
-                    throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
-            }
+                $v = self::Verificar($id);
 
-            else
-            throw new PDOException("NO EXISTE REGISTRO",4404);
+                if($v== 1){
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta =$objetoAccesoDato->RetornarConsulta("
+                        update personal 
+                        set nombre=:nom,
+                            apellido=:ape,
+                            puesto=:pue
+                        WHERE  ID LIKE :id");
+                    $consulta->bindValue(':ID',$id, PDO::PARAM_INT);
+                    $consulta->bindValue(':nom',$nom, PDO::PARAM_STR);
+                    $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
+                    $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
+            
+                    if($consulta->execute() == true)
+                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                    else
+                        throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
+                }
+
+                 else
+                {
+
+                    if($v == -1)
+                        throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    else 
+                        throw new PDOException("NO EXISTE REGISTRO",4404);
+                
+
+                }
         }
 
      catch( PDOException $e){
@@ -62,24 +72,30 @@ class Personal {
     public static function EliminarEmpleado($id){
 
         try{
+                $v = self::Verificar($id);
         
-            if( self::Verificar($id) == true){
-                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-                $consulta= $objetoAccesoDato->RetornarConsulta("DELETE FROM personal WHERE ID = :id");
-                $consulta->bindValue(':id',$id,PDO::PARAM_INT);
+                if( $v === 1){
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+                    $consulta= $objetoAccesoDato->RetornarConsulta("DELETE FROM personal WHERE ID = :id");
+                    $consulta->bindValue(':id',$id,PDO::PARAM_INT);
+    
+                    if($consulta->execute() == true)
+                        return " ---------> SE BORRO REGISTRO CORRECTAMENTE <---------<br>";
 
-                if($consulta->execute() == true)
-                    return " ---------> SE BORRO REGISTRO CORRECTAMENTE <---------<br>";
+                    else
+                        throw new PDOException("ERROR AL ELIMINAR EL REGISTRO");
+                }
 
                 else
-                    throw new PDOException("ERROR AL ELIMINAR EL REGISTRO");
-            }
+                {
 
-            else
-                throw new PDOException("NO EXISTE REGISTRO",4404);
+                    if($v == -1)
+                        throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    else 
+                        throw new PDOException("NO EXISTE REGISTRO",4404);
+                
 
-            if(self::Verificar($id) == -1)
-                throw new PDOException("NO HAY REGISTROS DISPONIBLES",4405);
+                }
         }
         catch(PDOException $e){
             return "*********** ERROR ***********<br>" . $e->getCode() .' : '. strtoupper($e->getMessage()) . "<br>******************************";  
@@ -107,20 +123,26 @@ class Personal {
     private static function Verificar($id){
         try{
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-            $verificar= $objetoAccesoDato->RetornarConsulta("SELECT ID FROM personal WHERE ID = :id");
+            $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM personal WHERE ID = :id");
             $verificar->bindValue(':id', $id, PDO::PARAM_INT);
             $verificar->execute();
-
-            if($verificar->fetchColumn()!= false)
-                return true;
-             else
-                if($verificar->fetchColumn()== false){
-                    $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM personal ");
-                        var_dump($verificar->execute());
-                    }
-              
-            
-
+            $band;
+  
+            if( intval($verificar->fetchColumn()) == 1)
+                $band = 1;
+            else{
+                if($verificar->fetchColumn() == 0 ){
+                    $v= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM personal");
+                    $v->execute();
+                    if($v->fetchColumn()!=0)
+                        $band = 0;
+                    else
+                        $band = -1;
+                       
+                }
+               
+            }
+            return $band;
         }
         catch(PDOException $e){
             return "*********** ERROR ***********<br>" . $verificar->errorCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************";  
