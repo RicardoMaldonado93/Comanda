@@ -49,7 +49,7 @@ $app->group('/api' , function(){
         $this->get('[/]', \PersonalApi::class . ':MostrarTodos');
         $this->get('/{id}', \PersonalApi::class . ':MostrarUno');
 
-        $this->post('/suspender', \PersonalApi::class . ':SuspenderEmpleado');
+        $this->post('/suspender', \PersonalApi::class . ':Suspender');
     });
 
     $this->group('/mozo', function(){

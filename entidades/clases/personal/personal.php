@@ -3,6 +3,7 @@
 require_once './entidades/clases/conexion/AccesoDatos.php';
 require_once './entidades/enums/estadoEmpleado.php';
 
+
 class Personal  {
 
     public static function AgregarEmpleado($nom, $ape, $puesto){
@@ -159,6 +160,7 @@ class Personal  {
                    
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                     $consulta =$objetoAccesoDato->RetornarConsulta("update personal set estado=:est WHERE ID LIKE :id");
+                    $consulta->bindValue(':id', $id, PDO::PARAM_INT);
                     $consulta->bindValue(':est', $estado, PDO::PARAM_STR);
 
                     if($consulta->execute() == true)
@@ -195,6 +197,7 @@ class Personal  {
                    
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                     $consulta =$objetoAccesoDato->RetornarConsulta("update personal set puesto=:pue WHERE ID LIKE :id");
+                    $consulta->bindValue(':id', $id, PDO::PARAM_INT);
                     $consulta->bindValue(':pue', $estado, PDO::PARAM_STR);
                     
                     if($consulta->execute() == true)
@@ -210,6 +213,43 @@ class Personal  {
                         throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
                     else 
                         throw new PDOException("NO EXISTE REGISTRO",4404);
+                
+
+                }
+        }
+
+     catch( PDOException $e){
+    
+        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function SuspenderEmpleado($id){
+
+        try{
+
+                $v = self::Verificar($id);
+
+                if($v== 1){
+                   
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set puesto=:pue WHERE ID LIKE :id");
+                    $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+                    $consulta->bindValue(':pue', Estado::Suspendido, PDO::PARAM_STR);
+                    
+                    if($consulta->execute() == true)
+                        return " ---------> SE HA SUSPENDIDO AL EMPLEADO <---------<br>";
+                    else
+                        throw new PDOException ("ERROR AL SUSPENDER");    
+                }
+
+                 else
+                {
+
+                    if($v == -1)
+                        throw new PDOException("NINGUN REGISTRO A SUSPENDER",4405);
+                    else 
+                        throw new PDOException("NO EXISTE REGISTRO A SUSPENDER",4404);
                 
 
                 }
