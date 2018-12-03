@@ -28,11 +28,34 @@ class PersonalApi extends Personal implements IPersonal{
             return $response->withStatus(400);
 
     }
+
     public static function Eliminar($request, $response, $args){
         
         $datos=$request->getParams();
         $empleado = Personal::EliminarEmpleado($datos['id']);
         
+        if($empleado != NULL) 
+            return $response->withJson($empleado, 200);
+        else
+            return $response->withStatus(400);
+    }
+
+    public static function CambiarPuesto( $request, $response, $args){
+
+        $datos = $response->getParsedBody();
+        $empleado = Personal::ModificarPuesto($datos['id'],$datos['puesto']);
+
+        if($empleado != NULL) 
+            return $response->withJson($empleado, 200);
+        else
+            return $response->withStatus(400);
+    }
+
+    public static function CambiarEstado( $request, $response, $args){
+
+        $datos = $response->getParsedBody();
+        $empleado = Personal::ModificarEstado($datos['id'],$datos['estado']);
+
         if($empleado != NULL) 
             return $response->withJson($empleado, 200);
         else

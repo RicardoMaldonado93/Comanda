@@ -1,20 +1,20 @@
 <?php
 
 require_once './entidades/clases/conexion/AccesoDatos.php';
-require_once './entidades/enums/tipoEmpleado.php';
+require_once './entidades/enums/estadoEmpleado.php';
 
-class Personal {
+class Personal  {
 
     public static function AgregarEmpleado($nom, $ape, $puesto){
 
         try{
 
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO personal(nombre,apellido,puesto) VALUES ( :nom, :ape, :pue )");
+            $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO personal(nombre,apellido,puesto, estado) VALUES ( :nom, :ape, :pue, :est)");
             $consulta->bindValue(':nom', $nom, PDO::PARAM_STR);
             $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
             $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
-            
+            $consulta->bindValue(':est', Estado::Activo, PDO::PARAM_STR);
 
             if($consulta->execute()==true)
                 return "---------> SE AGREGO CORRECTAMENTE EL EMPLEADO <---------";
@@ -27,7 +27,7 @@ class Personal {
         }
     }
 
-    public static function ModificarEmpleado($id, $nom, $ape, $puesto){
+    public static function ModificarEmpleado($id, $nom, $ape, $puesto, $estado){
 
         try{
 
@@ -36,12 +36,12 @@ class Personal {
                 if($v== 1){
                    
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set nombre=:nom, apellido=:ape, puesto=:pue WHERE ID LIKE :id");
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set nombre=:nom, apellido=:ape, puesto=:pue, estado=:est WHERE ID LIKE :id");
                     $consulta->bindValue(':id',$id, PDO::PARAM_INT);
                     $consulta->bindValue(':nom',$nom, PDO::PARAM_STR);
                     $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
                     $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
-            
+                    $consulta->bindValue(':est', $estado, PDO::PARAM_STR);
                     if($consulta->execute() == true)
                         return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
                     else
@@ -146,6 +146,78 @@ class Personal {
         catch( PDOException $e){
 
             return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function ModificarEstado($id, $estado){
+
+        try{
+
+                $v = self::Verificar($id);
+
+                if($v== 1){
+                   
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set estado=:est WHERE ID LIKE :id");
+                    $consulta->bindValue(':est', $estado, PDO::PARAM_STR);
+
+                    if($consulta->execute() == true)
+                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                    else
+                        throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
+                }
+
+                 else
+                {
+
+                    if($v == -1)
+                        throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    else 
+                        throw new PDOException("NO EXISTE REGISTRO",4404);
+                
+
+                }
+        }
+
+     catch( PDOException $e){
+    
+        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function ModificarPuesto($id, $puesto){
+
+        try{
+
+                $v = self::Verificar($id);
+
+                if($v== 1){
+                   
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set puesto=:pue WHERE ID LIKE :id");
+                    $consulta->bindValue(':pue', $estado, PDO::PARAM_STR);
+                    
+                    if($consulta->execute() == true)
+                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                    else
+                        throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
+                }
+
+                 else
+                {
+
+                    if($v == -1)
+                        throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    else 
+                        throw new PDOException("NO EXISTE REGISTRO",4404);
+                
+
+                }
+        }
+
+     catch( PDOException $e){
+    
+        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
         }
     }
 
