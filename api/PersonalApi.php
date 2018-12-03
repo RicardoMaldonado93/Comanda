@@ -16,12 +16,22 @@ class PersonalApi extends Personal implements IPersonal{
             return $response->withStatus(400);
 
     }
+
     public static function Modificar($request, $response, $args){
+
+        $datos=$request->getParams();
+        $empleado = Personal::ModificarEmpleado($datos['id'],$datos['nombre'],$datos['apellido'],$datos['puesto']);
+        
+        if($empleado != NULL) 
+            return $response->withJson($empleado, 200);
+        else
+            return $response->withStatus(400);
 
     }
     public static function Eliminar($request, $response, $args){
         
-        $empleado = Personal::EliminarEmpleado($args['id']);
+        $datos=$request->getParams();
+        $empleado = Personal::EliminarEmpleado($datos['id']);
         
         if($empleado != NULL) 
             return $response->withJson($empleado, 200);
@@ -38,7 +48,17 @@ class PersonalApi extends Personal implements IPersonal{
         else
             return $response->withStatus(400);
     }
-    public static function MostrarUno($request, $response, $args){}
+
+    public static function MostrarUno($request, $response, $args){
+
+        $datos=$request->getParams();
+        $empleado = Personal::MostrarX($datos['id']);
+        
+        if($empleado != NULL) 
+            return $response->withJson($empleado, 200);
+        else
+            return $response->withStatus(400);
+    }
 
 }
 ?>

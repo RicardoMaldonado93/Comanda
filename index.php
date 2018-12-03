@@ -44,9 +44,15 @@ $app->group('/api' , function(){
     $this->group('/empleado', function(){
         $this->post('[/]', \PersonalApi::class . ':Agregar');
         $this->get('[/]', \PersonalApi::class . ':MostrarTodos');
-        $this->delete('/{id}', \PersonalApi::class . ':Eliminar');
-        //$this->post('[/]', \PersonalApi::class . ':Agregar');
+        $this->get('/mostrar[/]', \PersonalApi::class . ':MostrarUno');
+        $this->delete('/', \PersonalApi::class . ':Eliminar');
+        $this->put('[/]', \PersonalApi::class . ':Modificar');
     });
+
+    $this->group('/mozo', function(){
+        $this->post('[/]', \MozoApi::class . ':CargarPedido');
+    });
+
 });
 
 $app->run();

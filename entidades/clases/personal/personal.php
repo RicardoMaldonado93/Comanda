@@ -34,14 +34,10 @@ class Personal {
                 $v = self::Verificar($id);
 
                 if($v== 1){
+                   
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                    $consulta =$objetoAccesoDato->RetornarConsulta("
-                        update personal 
-                        set nombre=:nom,
-                            apellido=:ape,
-                            puesto=:pue
-                        WHERE  ID LIKE :id");
-                    $consulta->bindValue(':ID',$id, PDO::PARAM_INT);
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set nombre=:nom, apellido=:ape, puesto=:pue WHERE ID LIKE :id");
+                    $consulta->bindValue(':id',$id, PDO::PARAM_INT);
                     $consulta->bindValue(':nom',$nom, PDO::PARAM_STR);
                     $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
                     $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
@@ -65,6 +61,7 @@ class Personal {
         }
 
      catch( PDOException $e){
+    
         return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
         }
     }
@@ -117,6 +114,38 @@ class Personal {
         catch( PDOException $e){
 
             return "*********** ERROR ***********<br>" . $consulta->errorCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function MostrarX($id){
+        try{
+
+            $v = self::Verificar($id);
+
+            if($v== 1){
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM personal Where ID=:id");
+                $consulta->bindValue(':id', $id, PDO::PARAM_STR);
+                
+                if($consulta->execute()==true)
+                    return $consulta->fetchAll(PDO::FETCH_CLASS, 'Personal');
+                else
+                    throw new PDOException("ERROR AL MOSTRAR EMPLEADO");
+            }
+            else
+            {
+
+                if($v == -1)
+                    throw new PDOException("NINGUN REGISTRO A MOSTRAR",4405);
+                else 
+                    throw new PDOException("NO EXISTE REGISTRO",4404);
+            
+
+            }
+        }
+        catch( PDOException $e){
+
+            return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
         }
     }
 
