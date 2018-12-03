@@ -2,10 +2,10 @@
 
 abstract class Puesto {
 
-    const Mozo = 0;
-    const Bartender = 1;
-    const Cocinero = 2;
-    const Cervecero = 3;
-    const Socio = 4;
+    const Mozo = 1;
+    const Bartender = 2;
+    const Cocinero = 3;
+    const Cervecero = 4;
+    const Socio = 5;
 }
 ?>

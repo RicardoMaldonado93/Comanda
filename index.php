@@ -6,6 +6,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require_once './vendor/autoload.php';
 require_once './api/MenuApi.php';
 require_once './api/PersonalApi.php';
+require_once './api/PedidosApi.php';
 /*require_once './api/UsuarioApi.php';
 require_once './api/LoginApi.php';
 require_once './api/LogApi.php';
@@ -39,23 +40,25 @@ s
 })->add(\LogApi::class . ':Registro');*/
 
 $app->group('/api' , function(){
+    
     $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
 
     $this->group('/empleado', function(){
         $this->post('[/]', \PersonalApi::class . ':Agregar');
-        $this->delete('/', \PersonalApi::class . ':Eliminar');
+        $this->delete('[/]', \PersonalApi::class . ':Eliminar');
         $this->put('[/]', \PersonalApi::class . ':Modificar');
 
         $this->get('[/]', \PersonalApi::class . ':MostrarTodos');
         $this->get('/{id}', \PersonalApi::class . ':MostrarUno');
 
-        $this->post('/suspender', \PersonalApi::class . ':Suspender');
+        $this->put('/suspender[/]', \PersonalApi::class . ':Suspender');
+        $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
+        $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
     });
 
-    $this->group('/mozo', function(){
-        $this->post('[/]', \MozoApi::class . ':CargarPedido');
+    $this->group('/pedido', function(){
+        $this->post('[/]', \PedidosApi::class . ':TomarPedido');
     });
-
 });
 
 $app->run();

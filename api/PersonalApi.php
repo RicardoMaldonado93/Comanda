@@ -1,7 +1,7 @@
 <?php
 
 require_once './entidades/interfaces/Ipersonal.php';
-require_once './entidades/clases/personal/personal.php';
+require_once './entidades/clases/personal.php';
 
 class PersonalApi extends Personal implements IPersonal{
 
@@ -42,7 +42,7 @@ class PersonalApi extends Personal implements IPersonal{
 
     public static function CambiarPuesto( $request, $response, $args){
 
-        $datos = $response->getParsedBody();
+        $datos = $request->getParams();
         $empleado = Personal::ModificarPuesto($datos['id'],$datos['puesto']);
 
         if($empleado != NULL) 
@@ -53,8 +53,19 @@ class PersonalApi extends Personal implements IPersonal{
 
     public static function CambiarEstado( $request, $response, $args){
 
-        $datos = $response->getParsedBody();
+        $datos = $request->getParams();
         $empleado = Personal::ModificarEstado($datos['id'],$datos['estado']);
+
+        if($empleado != NULL) 
+            return $response->withJson($empleado, 200);
+        else
+            return $response->withStatus(400);
+    }
+
+    public static function Suspender($request, $response, $args){
+
+        $datos = $request->getParams();
+        $empleado = Personal::SuspenderEmpleado($datos['id']);
 
         if($empleado != NULL) 
             return $response->withJson($empleado, 200);
@@ -74,8 +85,7 @@ class PersonalApi extends Personal implements IPersonal{
 
     public static function MostrarUno($request, $response, $args){
 
-        $datos=$request->getParams();
-        $empleado = Personal::MostrarX($datos['id']);
+        $empleado = Personal::MostrarX($args['id']);
         
         if($empleado != NULL) 
             return $response->withJson($empleado, 200);

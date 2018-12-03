@@ -198,7 +198,7 @@ class Personal  {
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                     $consulta =$objetoAccesoDato->RetornarConsulta("update personal set puesto=:pue WHERE ID LIKE :id");
                     $consulta->bindValue(':id', $id, PDO::PARAM_INT);
-                    $consulta->bindValue(':pue', $estado, PDO::PARAM_STR);
+                    $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
                     
                     if($consulta->execute() == true)
                         return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
@@ -233,9 +233,9 @@ class Personal  {
                 if($v== 1){
                    
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set puesto=:pue WHERE ID LIKE :id");
+                    $consulta =$objetoAccesoDato->RetornarConsulta("update personal set estado=:est WHERE ID LIKE :id");
                     $consulta->bindValue(':id', $id, PDO::PARAM_INT);
-                    $consulta->bindValue(':pue', Estado::Suspendido, PDO::PARAM_STR);
+                    $consulta->bindValue(':est', Estado::Suspendido, PDO::PARAM_STR);
                     
                     if($consulta->execute() == true)
                         return " ---------> SE HA SUSPENDIDO AL EMPLEADO <---------<br>";

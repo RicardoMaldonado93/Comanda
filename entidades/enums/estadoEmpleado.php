@@ -2,8 +2,8 @@
 
 abstract class Estado{
 
-    const Activo = 0;
-    const Suspendido = 1;
-    const Inactivo = 2;
+    const Activo = 1;
+    const Suspendido = 2;
+    const Inactivo = 3;
 }
 ?>
