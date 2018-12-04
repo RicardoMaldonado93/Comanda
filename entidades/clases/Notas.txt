@@ -1,0 +1,30 @@
+  //var_dump($aP);
+           /* $c = explode(',', $aC);
+            var_dump($c);
+            $p = explode(',',$aP);
+            $tp= sizeof($p);
+            if($tp>1){
+                    
+                for($i=0; $i<$tp; $i++){
+                    if(sizeof($c)==0){
+                            $b[$i] = 1;
+                            echo ("IF INSERT INTO pedido(cliente,pedido,cantidad, estado) VALUES (".$cliente . "," .  $p[$i] . ",". $b[$i]. ",:est).<br>");
+                    }
+
+                    else{
+                        if( sizeof($c)< $tp && 1 < sizeof($c) ){
+                            
+                            $b[sizeof($c)+$i]= 1;
+                            echo (" ELSE INSERT INTO pedido(cliente,pedido,cantidad, estado) VALUES (".$cliente . "," .  $p[$i] . ",". $b[$i]. ",:est).<br>");
+                        }
+                        
+                    
+                        echo ("FUERA INSERT INTO pedido(cliente,pedido,cantidad, estado) VALUES (".$cliente . "," .  $p[$i] . ",". $c[$i]. ",:est).<br>");
+                    }
+                   
+                    //$v = $p[1][0];
+                    
+
+                }
+            }*/
+            //echo self::generarCodigo();

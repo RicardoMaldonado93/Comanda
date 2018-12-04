@@ -58,6 +58,11 @@ $app->group('/api' , function(){
 
     $this->group('/pedido', function(){
         $this->post('[/]', \PedidosApi::class . ':TomarPedido');
+        $this->put('[/]', \PedidosApi::class . ':Preparar');
+        $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
+        $this->get('/servir[/]', \PedidosApi::class . ':Servir');
+        $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
+        $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');
     });
 });
 
