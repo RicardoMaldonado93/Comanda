@@ -22,6 +22,8 @@ class Pedidos {
                     $Ctotal->execute();
                     $total =  $Ctotal->fetch();
                     $codigo = self::generarCodigo();
+                    $hora = date("H:i:s");
+                    $fecha = date("Y-m-d");
 
                     $consulta->bindValue(':id', $codigo , PDO::PARAM_STR);
                     $consulta->bindValue(':nom', $cliente, PDO::PARAM_STR);
@@ -31,11 +33,11 @@ class Pedidos {
                     $consulta->bindValue(':cant', $cantidad, PDO::PARAM_INT);
                     $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
                     $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
-                    $consulta->bindValue(':hi', date("H:i:s"), PDO::PARAM_STR);
-                    $consulta->bindValue(':fe', date("Y-m-d"), PDO::PARAM_STR);
+                    $consulta->bindValue(':hi', $hora , PDO::PARAM_STR);
+                    $consulta->bindValue(':fe', $fecha , PDO::PARAM_STR);
         
                     if($consulta->execute()==true)
-                        return "---------> SE REALIZO EL PEDIDO <---------<br>" . "CODIGO: " . $codigo ;
+                        return "---------> SE REALIZO EL PEDIDO <---------<br><br>" . self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
                     
                     else
                         throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
@@ -251,14 +253,17 @@ class Pedidos {
             $consulta2 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 2");
             $consulta3 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 3");
             $consulta4 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 4");
+            $consulta5 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 5");
             
-            if($consulta->execute()==true && $consulta2->execute()==true && $consulta3->execute()==true && $consulta4->execute()==true){
+            if($consulta->execute()==true && $consulta2->execute()==true && $consulta3->execute()==true && $consulta4->execute()==true && $consulta5->execute()==true){
                 $pe = array( "PENDIENTES"=>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
                 $pre = array( "EN PREPARACION"=> $consulta2->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
                 $li = array( "PARA SERVIR"=> $consulta3->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
                 $ca = array( "CANCELADOS"=>$consulta4->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+                $en = array( "ENTREGADOS"=>$consulta5->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
 
-                return $pe + $pre + $li + $ca;
+
+                return $pe + $pre + $li + $ca + $en;
             }
             else
                 throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
@@ -332,6 +337,40 @@ class Pedidos {
             $code .= $alpha[rand(0, strlen($alpha)-1)];
         
         return strtoupper($code);
+    }
+
+    private static function CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total, $hora, $fecha){
+
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+        $Cmesa = $objetoAccesoDato->RetornarConsulta("SELECT m.codigo FROM mesa m WHERE m.id=:id ");
+        $Cmesa->bindValue(':id', $mesa, PDO::PARAM_INT);
+        $Cmesa->execute();
+
+        $Cmozo = $objetoAccesoDato->RetornarConsulta("SELECT nombre,apellido FROM personal  WHERE ID=:id ");
+        $Cmozo->bindValue(':id', $mozo, PDO::PARAM_INT);
+        $Cmozo->execute();
+
+        $Ccomida = $objetoAccesoDato->RetornarConsulta("SELECT c.nombre FROM menu c WHERE c.id=:id ");
+        $Ccomida->bindValue(':id', $pedido, PDO::PARAM_INT);
+        $Ccomida->execute();
+
+        $codMesa= $Cmesa->fetch();
+        $codMozo= $Cmozo->fetch();
+        $codCom= $Ccomida->fetch();
+
+        return "<pre><br>******************** TICKET DE COMPRA *********************<br><br>".
+                " FECHA : " . $fecha  . "<br> HORA : " . $hora .
+                "<br><br>***********************************************************<br><br>".
+                " CODIGO : " .  $codigo . "<br>" .
+                " MESA : " . $codMesa[0] . "<br>".
+                " MOZO : " . $codMozo[1] . "<br>" . 
+                "<br>***********************************************************<br><br>".
+                " PEDIDO : " .  strtoupper($codCom[0]) . "<br>".
+                " CANTIDAD : " . $cantidad . "<br>".
+                "<br>***********************************************************<br><br>".
+                " TOTAL : $" . $total ;
+
+        
     }
 
 
