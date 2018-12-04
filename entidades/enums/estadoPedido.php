@@ -6,5 +6,6 @@ abstract class EPedido{
     const EnPreparacion = 2;
     const ListoParaServir = 3;
     const Cancelado = 4;
+    const Entregado = 5;
 }
 ?>

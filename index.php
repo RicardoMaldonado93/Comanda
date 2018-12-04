@@ -61,6 +61,7 @@ $app->group('/api' , function(){
         $this->put('[/]', \PedidosApi::class . ':Preparar');
         $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
         $this->put('/servir[/]', \PedidosApi::class . ':Servir');
+        $this->delete('/entregado', \PedidosApi::class . ':Entregar');
 
         $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
         $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');

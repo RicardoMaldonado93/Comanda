@@ -2,6 +2,8 @@
 
 require_once './entidades/clases/conexion/AccesoDatos.php';
 require_once './entidades/enums/estadoPedido.php';
+require_once './entidades/clases/validaciones/validacion.php';
+require_once './entidades/clases/mesa.php';
 
 class Pedidos {
 
@@ -9,42 +11,48 @@ class Pedidos {
         
         date_default_timezone_set("America/Argentina/Buenos_Aires");
         try{
+                $v = Mesa::ocuparMesa($mesa);
+                
+                if($v == 1){
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(ID, cliente, mesa , mozo, pedido, cantidad, estado, total, horaInicio, fecha) VALUES ( :id, :nom, :me, :mo, :ped, :cant, :est, :tot, :hi, :fe)");
 
-            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(ID, cliente, mesa , mozo, pedido, cantidad, estado, total, horaInicio, fecha) VALUES ( :id, :nom, :me, :mo, :ped, :cant, :est, :tot, :hi, :fe)");
+                    $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $cantidad . " as Total FROM menu  WHERE ID=:id ");
+                    $Ctotal->bindValue(':id', $pedido, PDO::PARAM_INT);
+                    $Ctotal->execute();
+                    $total =  $Ctotal->fetch();
+                    $codigo = self::generarCodigo();
 
-            $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $cantidad . " as Total FROM menu  WHERE ID=:id ");
-            $Ctotal->bindValue(':id', $pedido, PDO::PARAM_INT);
-            $Ctotal->execute();
-            $total =  $Ctotal->fetch();
-            $codigo = self::generarCodigo();
-
-            $consulta->bindValue(':id', $codigo , PDO::PARAM_STR);
-            $consulta->bindValue(':nom', $cliente, PDO::PARAM_STR);
-            $consulta->bindValue(':me', $mesa, PDO::PARAM_INT);
-            $consulta->bindValue(':mo', $mozo, PDO::PARAM_INT);
-            $consulta->bindValue(':ped', $pedido , PDO::PARAM_INT);
-            $consulta->bindValue(':cant', $cantidad, PDO::PARAM_INT);
-            $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
-            $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
-            $consulta->bindValue(':hi', date("H:i:s"), PDO::PARAM_STR);
-            $consulta->bindValue(':fe', date("Y-m-d"), PDO::PARAM_STR);
-   
-            if($consulta->execute()==true)
-                return "---------> SE REALIZO EL PEDIDO <---------<br>" . "CODIGO: " . $codigo ;
-            
-            else
-               throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
+                    $consulta->bindValue(':id', $codigo , PDO::PARAM_STR);
+                    $consulta->bindValue(':nom', $cliente, PDO::PARAM_STR);
+                    $consulta->bindValue(':me', $mesa, PDO::PARAM_INT);
+                    $consulta->bindValue(':mo', $mozo, PDO::PARAM_INT);
+                    $consulta->bindValue(':ped', $pedido , PDO::PARAM_INT);
+                    $consulta->bindValue(':cant', $cantidad, PDO::PARAM_INT);
+                    $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                    $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                    $consulta->bindValue(':hi', date("H:i:s"), PDO::PARAM_STR);
+                    $consulta->bindValue(':fe', date("Y-m-d"), PDO::PARAM_STR);
+        
+                    if($consulta->execute()==true)
+                        return "---------> SE REALIZO EL PEDIDO <---------<br>" . "CODIGO: " . $codigo ;
+                    
+                    else
+                        throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
+                }
+                
+                else
+                    throw new PDOException( Mesa::ocuparMesa($mesa));
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . $e->getCode() . ': '. strtoupper($e->getMessage()) . "<br>******************************"; 
+            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
         }
     }
 
     public static function prepararPedido($codigo,$demora){
         try{
 
-            $v = self::Verificar($codigo);
+            $v = Validar::Existe($codigo,'pedido');
 
             if($v== 1){
                
@@ -89,7 +97,7 @@ class Pedidos {
     public static function cancelarPedido($codigo, $sector){
         try{
 
-            $v = self::Verificar($codigo);
+            $v = Validar::Existe($codigo,'pedido');
 
             if($v== 1){
                
@@ -125,7 +133,7 @@ class Pedidos {
     public static function servirPedido($codigo, $sector){
         try{
 
-            $v = self::Verificar($codigo);
+            $v = Validar::Existe($codigo,'pedido');
 
             if($v== 1){
                
@@ -158,10 +166,54 @@ class Pedidos {
             }
     }
 
+    public static function entregarPedido($codigo){
+        try{
+
+            $v = Validar::Existe($codigo,'pedido');
+
+            if($v== 1){
+               
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $mesa = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM mesa m, pedido p WHERE p.ID =:cod AND m.id = p.mesa");
+                $mesa->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                $mesa->execute();
+                $nroMesa = $mesa->fetch();
+
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET estado=:es WHERE ID LIKE :id");
+                $consulta->bindValue(':id',$codigo, PDO::PARAM_STR);
+                $consulta->bindValue(':es', EPedido::Entregado, PDO::PARAM_INT);
+
+                if($consulta->execute() == true)
+                    if(Mesa::estadoMesa($nroMesa[0], 2) == 1)
+                        return " ---------> SE REGISTRO ENTREGA <---------";
+                    else
+                        throw new PDOException(Mesa::estadoMesa($nroMesa,5));
+                else
+                    throw new PDOException ("ERROR AL REGISTRAR ENTREGA");    
+            }
+
+             else
+            {
+
+                if($v == -1)
+                    throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                else 
+                    throw new PDOException("NO EXISTE REGISTRO",4404);
+            
+
+            }
+        }
+
+        catch( PDOException $e){
+
+            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            }
+    }
+
     public static function traerPedido($codigo){
         try{
 
-            $v = self::Verificar($codigo);
+            $v = Validar::Existe($codigo,'pedido');
 
             if($v== 1){
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
@@ -280,36 +332,6 @@ class Pedidos {
             $code .= $alpha[rand(0, strlen($alpha)-1)];
         
         return strtoupper($code);
-    }
-
-    private static function Verificar($codigo){
-        try{
-            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
-            $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM pedido WHERE id = :id");
-            $verificar->bindValue(':id', $codigo, PDO::PARAM_STR);
-            $verificar->execute();
-            $band;
-            
-  
-            if( intval($verificar->fetchColumn()) == 1)
-                $band = 1;
-            else{
-                if($verificar->fetchColumn() == 0 ){
-                    $v= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM pedido");
-                    $v->execute();
-                    if($v->fetchColumn()!=0)
-                        $band = 0;
-                    else
-                        $band = -1;
-                       
-                }
-               
-            }
-            return $band;
-        }
-        catch(PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************";  
-        }
     }
 
 

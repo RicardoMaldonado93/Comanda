@@ -57,6 +57,17 @@ class PedidosApi extends Pedidos implements IPedidos{
             return $response->withStatus(400);
     }
 
+    public static function Entregar( $request, $response, $args){
+        
+        $datos = $request->getParams();
+        $pedido = Pedidos::entregarPedido($datos['codigo']);
+
+        if($pedido != NULL) 
+            return $response->withJson($pedido, 200);
+        else
+            return $response->withStatus(400);
+
+    }
     public static function MostrarPedido( $request, $response, $args){
 
         $pedido = Pedidos::traerPedido($args['id']);
