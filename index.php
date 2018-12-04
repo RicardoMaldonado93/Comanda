@@ -60,9 +60,13 @@ $app->group('/api' , function(){
         $this->post('[/]', \PedidosApi::class . ':TomarPedido');
         $this->put('[/]', \PedidosApi::class . ':Preparar');
         $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
-        $this->get('/servir[/]', \PedidosApi::class . ':Servir');
+        $this->put('/servir[/]', \PedidosApi::class . ':Servir');
+
         $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
         $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');
+        $this->get('/estado/{es}[/]', \PedidosApi::class . ':MostrarEstado');
+        $this->get('/sector/{se}[/]', \PedidosApi::class . ':MostrarSector');
+      
     });
 });
 

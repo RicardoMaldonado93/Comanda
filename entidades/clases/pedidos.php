@@ -195,10 +195,19 @@ class Pedidos {
         try{
 
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m Where m.id = p.pedido");
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 1");
+            $consulta2 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 2");
+            $consulta3 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 3");
+            $consulta4 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 4");
             
-            if($consulta->execute()==true)
-                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos');
+            if($consulta->execute()==true && $consulta2->execute()==true && $consulta3->execute()==true && $consulta4->execute()==true){
+                $pe = array( "PENDIENTES"=>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+                $pre = array( "EN PREPARACION"=> $consulta2->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+                $li = array( "PARA SERVIR"=> $consulta3->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+                $ca = array( "CANCELADOS"=>$consulta4->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+
+                return $pe + $pre + $li + $ca;
+            }
             else
                 throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
         }
@@ -207,6 +216,60 @@ class Pedidos {
         }
     }
     
+    public static function traerEstado($estado){
+
+        try{
+                $es; $cabecera;
+                switch(strtoupper($estado)){
+
+                    case '1': { $es = 1; $cabecera = "PENDIENTES"; break;}
+                    case '2': { $es = 2; $cabecera = "EN PREPARACION"; break;}
+                    case '3': { $es = 3; $cabecera = "LISTOS PARA SERVIR"; break;}
+                    case '4': { $es = 4; $cabecera = "CANCELADOS"; break;}
+
+                }
+
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = :es");
+                $consulta->bindValue(':es', $es, PDO::PARAM_INT);
+            
+                if($consulta->execute()==true)
+                    return array( $cabecera =>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));         
+                else
+                    throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
+        }
+        catch( PDOException $e){
+            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function traerSector($estado){
+
+        try{
+                $se; $cabecera;
+                switch(strtoupper($estado)){
+
+                    case '1': { $se = 1; $cabecera = "CERVECERIA"; break; }
+                    case '2': { $se = 2; $cabecera = "COCINA"; break; }
+                    case '3': { $se = 3; $cabecera = "BARTENDER"; break; }
+                    case '4': { $se = 4; $cabecera = "CANDYBAR"; break; }
+
+                }
+
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND m.sector = :se");
+                $consulta->bindValue(':se', $se, PDO::PARAM_INT);
+            
+                if($consulta->execute()==true)
+                    return array( $cabecera =>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));         
+                else
+                    throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
+        }
+        catch( PDOException $e){
+            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
     private static function generarCodigo(){
 
         $alpha = "123qwertyuiopa456sdfghjklzxcvbnm789";
