@@ -3,10 +3,10 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-require_once './vendor/autoload.php';
-require_once './api/MenuApi.php';
-require_once './api/PersonalApi.php';
-require_once './api/PedidosApi.php';
+require_once './composer/vendor/autoload.php';
+require_once './API/MenuApi.php';
+require_once './API/PersonalApi.php';
+require_once './API/PedidosApi.php';
 /*require_once './api/UsuarioApi.php';
 require_once './api/LoginApi.php';
 require_once './api/LogApi.php';
