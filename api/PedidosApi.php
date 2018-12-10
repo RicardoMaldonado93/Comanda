@@ -8,31 +8,30 @@ class PedidosApi extends Pedidos implements IPedidos{
     public static function TomarPedido( $request, $response, $args){
 
         $datos = $request->getParsedBody();
-        $pedido = $datos['pedido'];
+        $pedido = json_decode($datos['pedido']);
         $mozo = $datos['mozo'];
         $mesa =$datos['mesa'];
-        $cant = $datos['cantidad'];
         $cliente = $datos['cliente'];
 
-        $orden = Pedidos::cargarPedido($mesa, $mozo, $pedido, $cant, $cliente);
+        $orden = Pedidos::cargarPedido($mesa, $mozo, $pedido, $cliente);
 
         if($orden != NULL) 
             return $response->withJson($orden, 200);
         else
             return $response->withStatus(400);
 
-    }
+     }
 
     public static function Preparar( $request, $response, $args){
 
         $datos = $request->getParams();
-        $pedido = Pedidos::prepararPedido($datos['codigo'],$datos['demora']);
+        $pedido = Pedidos::prepararPedido($datos['id'],$datos['codigo'],$datos['demora']);
 
         if($pedido != NULL) 
             return $response->withJson($pedido, 200);
         else
             return $response->withStatus(400);
-    }
+     }
 
     public static function Cancelar( $request, $response, $args){
 
@@ -44,18 +43,18 @@ class PedidosApi extends Pedidos implements IPedidos{
         else
             return $response->withStatus(400);
 
-    }
+     }
 
-    public static function Servir( $request, $response, $args ){
+    public static function ListoParaServir( $request, $response, $args ){
         
         $datos = $request->getParams();
-        $pedido = Pedidos::servirPedido($datos['codigo'], $datos['sector']);
+        $pedido = Pedidos::pedidoListo($datos['id'], $datos['codigo'], $datos['sector']);
 
         if($pedido != NULL) 
             return $response->withJson($pedido, 200);
         else
             return $response->withStatus(400);
-    }
+     }
 
     public static function Entregar( $request, $response, $args){
         
@@ -67,7 +66,8 @@ class PedidosApi extends Pedidos implements IPedidos{
         else
             return $response->withStatus(400);
 
-    }
+     }
+
     public static function MostrarPedido( $request, $response, $args){
 
         $pedido = Pedidos::traerPedido($args['id']);
@@ -76,7 +76,7 @@ class PedidosApi extends Pedidos implements IPedidos{
             return $response->withJson($pedido, 200);
         else
             return $response->withStatus(400);
-    }
+     }
 
     public static function MostrarPedidos( $request, $response, $args){
 
@@ -86,7 +86,7 @@ class PedidosApi extends Pedidos implements IPedidos{
             return $response->withJson($pedido, 200);
         else
             return $response->withStatus(400);
-    }
+     }
 
     public static function MostrarEstado( $request, $response, $args){
 
@@ -107,7 +107,7 @@ class PedidosApi extends Pedidos implements IPedidos{
         catch(Exception $e){
             return $response->withJson($e->getMessage(), 404);
         }
-    }
+     }
 
     public static function MostrarSector( $request, $response, $args){
 
@@ -129,5 +129,24 @@ class PedidosApi extends Pedidos implements IPedidos{
              return $response->withJson($e->getMessage(), 404);
          }
      }
+
+    public static function VerMiPedido( $request, $response, $args){
+        
+        try{
+                $datos = $request->getParams();
+                $pedido = Pedidos::verEstadoPedido($datos['codigo'],$datos['mesa']);
+
+                if($pedido != NULL) 
+                    return $response->withJson($pedido, 200);
+                else
+                    return $response->withStatus(400);
+                    
+        }
+        catch(Exception $e){
+            return $response->withJson($e->getMessage(), 200);
+        }
+
+    }
 }
+
 ?>

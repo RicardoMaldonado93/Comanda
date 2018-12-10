@@ -3,44 +3,88 @@
 require_once './entidades/clases/conexion/AccesoDatos.php';
 require_once './entidades/enums/estadoPedido.php';
 require_once './entidades/clases/validaciones/validacion.php';
+require_once './entidades/clases/personal.php';
 require_once './entidades/clases/mesa.php';
 
 class Pedidos {
 
-    public static function cargarPedido($mesa, $mozo, $pedido, $cantidad, $cliente){
+    public static function cargarPedido($mesa, $mozo, $lista_pedido, $cliente){
         
         date_default_timezone_set("America/Argentina/Buenos_Aires");
         try{
-                $v = Mesa::ocuparMesa($mesa);
+                $v = Mesa::ocuparMesa($mesa); //Verifico si la mesa esta cerrada.
+                $band = false;
+               // var_dump($lista_pedido);
                 
                 if($v == 1){
-                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                    $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(ID, cliente, mesa , mozo, pedido, cantidad, estado, total, horaInicio, fecha) VALUES ( :id, :nom, :me, :mo, :ped, :cant, :est, :tot, :hi, :fe)");
 
-                    $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $cantidad . " as Total FROM menu  WHERE ID=:id ");
-                    $Ctotal->bindValue(':id', $pedido, PDO::PARAM_INT);
-                    $Ctotal->execute();
-                    $total =  $Ctotal->fetch();
+                    //cargo los pedidos pasados en el json
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                   
                     $codigo = self::generarCodigo();
                     $hora = date("H:i:s");
                     $fecha = date("Y-m-d");
-
-                    $consulta->bindValue(':id', $codigo , PDO::PARAM_STR);
-                    $consulta->bindValue(':nom', $cliente, PDO::PARAM_STR);
-                    $consulta->bindValue(':me', $mesa, PDO::PARAM_INT);
-                    $consulta->bindValue(':mo', $mozo, PDO::PARAM_INT);
-                    $consulta->bindValue(':ped', $pedido , PDO::PARAM_INT);
-                    $consulta->bindValue(':cant', $cantidad, PDO::PARAM_INT);
-                    $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
-                    $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
-                    $consulta->bindValue(':hi', $hora , PDO::PARAM_STR);
-                    $consulta->bindValue(':fe', $fecha , PDO::PARAM_STR);
-        
-                    if($consulta->execute()==true)
-                        return "---------> SE REALIZO EL PEDIDO <---------<br><br>" . self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
                     
-                    else
-                        throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
+                    foreach( $lista_pedido as $pedido ){
+                        
+                       
+                        if(isset($pedido)){
+                            $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $pedido->{'cantidad'} . " as Total FROM menu  WHERE ID=:id ");
+                            $Ctotal->bindValue(':id', $pedido->{'id'}, PDO::PARAM_INT);
+                            $Ctotal->execute();
+                            $total =  $Ctotal->fetch();
+                            
+                            $CP = $objetoAccesoDato->RetornarConsulta("INSERT INTO productopedido( codigo, idProducto , cantidad, estado, total, horaInicio, fecha)
+                                                                        VALUES ( :cod, :iP, :cant, :est, :tot, :hi, :fe)");
+
+                            $CP->bindValue(':cod', $codigo , PDO::PARAM_STR);
+                            $CP->bindValue(':iP', $pedido->{'id'}, PDO::PARAM_INT);
+                            $CP->bindValue(':cant', $pedido->{'cantidad'}, PDO::PARAM_INT);
+                            $CP->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                            $CP->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                            $CP->bindValue(':hi', $hora , PDO::PARAM_STR);
+                            $CP->bindValue(':fe', $fecha , PDO::PARAM_STR);
+                            
+                            //si se cargo correctamente el producto cambio el valor de la bandera a true de lo contrario false;
+                            if($CP->execute())
+                                $band = true; 
+                            else
+                                $band = false;
+                        }
+                        else
+                            break;
+                    }
+
+                    if($band){
+
+                        $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT SUM(total) as Total FROM productopedido  WHERE codigo=:cod ");
+                        $Ctotal->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                        $Ctotal->execute();
+                        $total =  $Ctotal->fetch();
+
+                        //de ser la bandera verdadera, cargo el pedido a la base de datos
+                        $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(codigo, cliente, mesa , mozo, estado, total, horaInicio, fecha) VALUES ( :cod, :nom, :me, :mo, :est, :tot, :hi, :fe)");
+
+                        $consulta->bindValue(':cod', $codigo , PDO::PARAM_STR);
+                        $consulta->bindValue(':nom', $cliente, PDO::PARAM_STR);
+                        $consulta->bindValue(':me', $mesa, PDO::PARAM_INT);
+                        $consulta->bindValue(':mo', $mozo, PDO::PARAM_INT);
+                        $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                        $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                        $consulta->bindValue(':hi', $hora , PDO::PARAM_STR);
+                        $consulta->bindValue(':fe', $fecha , PDO::PARAM_STR);
+
+                        
+                        if($consulta->execute()==true){
+                           // $respuesta->mensaje = "PEDIDO REALIZADO";
+                            //$respuesta->codigo = $codigo;
+                            return "---------> SE REALIZO EL PEDIDO <---------<br><br>" ;// self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
+                            //return $respuesta;
+                        }
+                        else
+                            throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
+                        }
+            
                 }
                 
                 else
@@ -51,29 +95,32 @@ class Pedidos {
         }
     }
 
-    public static function prepararPedido($codigo,$demora){
+    public static function prepararPedido($id, $codigo, $demora){
         try{
 
-            $v = Validar::Existe($codigo,'pedido');
+            $v = Validar::ExistePedido($codigo);
 
             if($v== 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 
-                $CalHora = $objetoAccesoDato->RetornarConsulta("SELECT horaInicio + INTERVAL :demora MINUTE as Fin FROM pedido  WHERE ID =:id"); 
-                $CalHora->bindValue(':id', $codigo, PDO::PARAM_STR);
+                $CalHora = $objetoAccesoDato->RetornarConsulta("SELECT horaInicio + INTERVAL :demora MINUTE as Fin FROM productopedido  WHERE codigo =:cod AND idProducto = :id"); 
+                $CalHora->bindValue(':id', $id, PDO::PARAM_INT);
+                $CalHora->bindValue(':cod', $codigo, PDO::PARAM_STR);
                 $CalHora->bindValue(':demora',$demora, PDO::PARAM_INT);
                 $CalHora->execute();
                 $hora = $CalHora->fetch();
 
-                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET horaFin=:fin,  demora= :de, estado=:es WHERE ID LIKE :id");
-                $consulta->bindValue(':id',$codigo, PDO::PARAM_STR);
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET horaFin=:fin,  demora= :de, estado=:es WHERE idProducto = :id AND codigo = :cod");
+                $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+                $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
                 $consulta->bindValue(':de', $demora, PDO::PARAM_INT);
                 $consulta->bindValue(':es', EPedido::EnPreparacion, PDO::PARAM_INT);
                 $consulta->bindValue(':fin', $hora[0], PDO::PARAM_STR);
 
                 if($consulta->execute() == true)
-                    return " ---------> EL PEDIDO SE ENCUENTRA EN PREPARACION <---------s";
+                    if( self::ActualizarEstado($codigo) == true)
+                        return " ---------> EL PEDIDO SE ENCUENTRA EN PREPARACION <---------";
                 else
                     throw new PDOException ("ERROR AL PREPARAR EL PEDIDO");    
             }
@@ -96,16 +143,17 @@ class Pedidos {
             }
     }
 
-    public static function cancelarPedido($codigo, $sector){
+    public static function cancelarPedido($id, $codigo, $sector){
         try{
 
-            $v = Validar::Existe($codigo,'pedido');
+            $v = Validar::ExistePedido($codigo);
 
             if($v== 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET estado=:es WHERE ID LIKE :id");
-                $consulta->bindValue(':id',$codigo, PDO::PARAM_STR);
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET estado=:es WHERE iProducto=:id, codigo =:cod");
+                $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+                $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
                 $consulta->bindValue(':es', EPedido::Cancelado, PDO::PARAM_INT);
 
                 if($consulta->execute() == true)
@@ -132,16 +180,17 @@ class Pedidos {
             }
     }
 
-    public static function servirPedido($codigo, $sector){
+    public static function pedidoListo($id, $codigo, $sector){
         try{
 
-            $v = Validar::Existe($codigo,'pedido');
+            $v = Validar::ExistePedido($codigo);
 
             if($v== 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET estado=:es WHERE ID LIKE :id");
-                $consulta->bindValue(':id',$codigo, PDO::PARAM_STR);
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET estado=:es WHERE idProducto:id AND codigo =:cod");
+                $consulta->bindValue(':id', $id, PDO::PARAM_INT);
+                $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
                 $consulta->bindValue(':es', EPedido::ListoParaServir, PDO::PARAM_INT);
 
                 if($consulta->execute() == true)
@@ -171,7 +220,7 @@ class Pedidos {
     public static function entregarPedido($codigo){
         try{
 
-            $v = Validar::Existe($codigo,'pedido');
+            $v = Validar::ExistePedido($codigo);
 
             if($v== 1){
                
@@ -215,12 +264,12 @@ class Pedidos {
     public static function traerPedido($codigo){
         try{
 
-            $v = Validar::Existe($codigo,'pedido');
-
+            $v = Validar::ExistePedido($codigo);
+            
             if($v== 1){
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m Where p.id=:id and m.id = p.pedido");
-                $consulta->bindValue(':id', $codigo, PDO::PARAM_STR);
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m Where p.codigo=:cod and m.id = p.idProducto");
+                $consulta->bindValue(':cod', $codigo, PDO::PARAM_STR);
                 
                 if($consulta->execute()==true)
                     return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos');
@@ -249,11 +298,11 @@ class Pedidos {
         try{
 
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 1");
-            $consulta2 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 2");
-            $consulta3 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 3");
-            $consulta4 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 4");
-            $consulta5 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = 5");
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 1");
+            $consulta2 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 2");
+            $consulta3 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 3");
+            $consulta4 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 4");
+            $consulta5 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 5");
             
             if($consulta->execute()==true && $consulta2->execute()==true && $consulta3->execute()==true && $consulta4->execute()==true && $consulta5->execute()==true){
                 $pe = array( "PENDIENTES"=>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
@@ -327,6 +376,121 @@ class Pedidos {
         }
     }
 
+    public static function verEstadoPedido($cod, $mesa){
+
+        try{
+                date_default_timezone_set("America/Argentina/Buenos_Aires");
+                $actual = date('y-m-d H:i:s');
+                $v = Validar::ExistePedido($cod);
+                    
+                if($v== 1){ //verifico si existe el codigo
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.* FROM pedido p Where p.codigo=:cod");
+                    $consulta->bindValue(':cod', $cod, PDO::PARAM_STR);
+                    
+                    if($consulta->execute()==true)
+                        $pedido = $consulta->fetch();
+                    
+                    if($pedido['codigo'] == $cod){ //verifico si el codigo coincide
+
+                        $mozo = Personal::MostrarX($pedido['mozo']);
+                        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM pedido p, mesa m WHERE p.codigo =:id AND m.id = p.mesa");
+                        $consulta->bindValue(':id', $cod, PDO::PARAM_STR);
+                        $consulta->execute();
+                        $Cmesa = $consulta->fetch();
+
+                        $e = strtotime( $pedido['fecha'] .$pedido['horaFin'] );
+                        $r = strtotime($actual);
+                        $d = date("i:s", $e-$r);
+            
+                        
+                        $t = $d ." MIN APROX";
+
+                        if(strtotime($d)== false)
+                        $t = "en proceso de entrega";
+                    
+                        if($pedido['mesa'] == $Cmesa[0]){ //verifico si la mesa coincide con el codigo
+                            return "<pre>******************** MI PEDIDO *********************<br><br>".
+                            " CODIGO: " . $cod . "<br>".
+                            " MESA : " . $mesa . "<br>".
+                            " MOZO : " . strtoupper($mozo[0]->{'apellido'})  . "<br>" . 
+                            "<br>****************************************************<br><br>".
+                            " DEMORA : " . $t. "<br>" ;
+                        }
+                        else
+                            throw new Exception("LA MESA NO COINCIDE",400);
+                    }
+                    else
+                        throw new Exception("EL CODIGO NO COINCIDE", 400);
+
+                }
+                else
+                    throw new Exception("NO EXISTE EL CODIGO",400);
+                    
+        }
+        catch( PDOException $e){
+            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+    }
+
+    public static function servirPedido($codigo){
+        try{
+              
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            
+            $pListo = $objetoAccesoDato->RetornarConsulta("SELECT estado, count(estado) AS cantidad FROM productopedido WHERE codigo = :cod AND estado = 3 group by estado"); 
+            $pListo->bindValue(':cod', $codigo, PDO::PARAM_STR);
+            $pListo->execute();
+            $Listo = $pListo->fetch();
+
+            $consulta =$objetoAccesoDato->RetornarConsulta("SELECT count(codigo) AS cantidad FROM productopedido WHERE codigo = :cod");
+            $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
+            $consulta->execute();
+            $Reg = $consulta->fetch();
+
+            if( $Reg == true)
+                return true;
+            else
+                throw new PDOException ("ERROR AL ACTUALIZAR EL PEDIDO");    
+        
+    }
+
+    catch( PDOException $e){
+
+        return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+        }
+
+    }
+
+    private static function ActualizarEstado($codigo){
+        try{
+              
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                
+                $maxDemora = $objetoAccesoDato->RetornarConsulta("SELECT horafin, MAX(demora)  FROM productopedido  WHERE codigo =:cod "); 
+                $maxDemora->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                $maxDemora->execute();
+                $demora = $maxDemora->fetch();
+
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET horaFin=:fin,  demora= :de WHERE codigo = :cod");
+                $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
+                $consulta->bindValue(':de', $demora[1], PDO::PARAM_INT);
+                $consulta->bindValue(':fin', $demora[0], PDO::PARAM_STR);
+
+                if($consulta->execute() == true)
+                    return true;
+                else
+                    throw new PDOException ("ERROR AL ACTUALIZAR EL PEDIDO");    
+            
+        }
+
+        catch( PDOException $e){
+
+            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            }
+    }
+    
     private static function generarCodigo(){
 
         $alpha = "123qwertyuiopa456sdfghjklzxcvbnm789";

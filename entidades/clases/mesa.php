@@ -50,7 +50,7 @@ class Mesa {
         catch( PDOException $e){
             return  strtoupper($e->getMessage()) ; 
         }
-    }
+     }
 
     public static function estadoMesa($nroMesa, $estado){
 
@@ -87,6 +87,6 @@ class Mesa {
         catch( PDOException $e){
             return  strtoupper($e->getMessage()) ; 
         }
-    }
+     }
 }
 ?>

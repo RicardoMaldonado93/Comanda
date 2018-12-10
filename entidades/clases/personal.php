@@ -122,7 +122,7 @@ class Personal  {
     public static function MostrarX($id){
         try{
 
-            $v = Validar::Existe($codigo,'personal');
+            $v = Validar::Existe($id,'personal');
 
             if($v== 1){
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 

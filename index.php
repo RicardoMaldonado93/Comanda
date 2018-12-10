@@ -18,57 +18,48 @@ $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
 
-/*
-$app->post('/api/login', \loginApi::class . ':Login');
-
-$app->group('/api', function(){
-
-   
-s
-    $this->group('/usuario', function(){
-        $this->post('[/]', \UsuarioApi::class . ':AgregarUsr');
-        $this->get('[/]', \UsuarioApi::class . ':MostrarUsr')->add( \MWAuth::class . ':Auth');
-    });
-    
-    $this->group('/compra', function(){
-        $this->post('[/]', \CompraApi::class . ':CargarCompra')->add(\MWAuth::class . ':VerificarUsuario');
-        $this->get('[/]', \CompraApi::Class . ':MostrarListado')->add(\MWAuth::class . ':Auth');
-        $this->get('/{marca}', \CompraApi::Class . ':MostrarMarca')->add(\MWAuth::class . ':Auth');
-    });
-    $this->get('/productos', \CompraApi::class . ':ListarProductos');
-    
-})->add(\LogApi::class . ':Registro');*/
 
 $app->group('/api' , function(){
     
     $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
 
     $this->group('/empleado', function(){
+
+        //ABM de empleados
         $this->post('[/]', \PersonalApi::class . ':Agregar');
         $this->delete('[/]', \PersonalApi::class . ':Eliminar');
         $this->put('[/]', \PersonalApi::class . ':Modificar');
 
+        //Listas de empleados 
         $this->get('[/]', \PersonalApi::class . ':MostrarTodos');
         $this->get('/{id}', \PersonalApi::class . ':MostrarUno');
 
+        //Cambios de estado y puesto de empleados 
         $this->put('/suspender[/]', \PersonalApi::class . ':Suspender');
         $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
         $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
     });
 
     $this->group('/pedido', function(){
+
+        //Operaciones con pedidos
         $this->post('[/]', \PedidosApi::class . ':TomarPedido');
         $this->put('[/]', \PedidosApi::class . ':Preparar');
+        //$this->put('/', \PedidosApi::class . ':ListoParaServir');
         $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
         $this->put('/servir[/]', \PedidosApi::class . ':Servir');
         $this->delete('/entregado', \PedidosApi::class . ':Entregar');
 
+        //Listados de pedidos gral y por sector
         $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
         $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');
         $this->get('/estado/{es}[/]', \PedidosApi::class . ':MostrarEstado');
         $this->get('/sector/{se}[/]', \PedidosApi::class . ':MostrarSector');
       
+    
     });
+    
+    $this->get('/miPedido', \PedidosApi::class . ':VerMiPedido');
 });
 
 $app->run();
