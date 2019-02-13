@@ -24,11 +24,11 @@ class Validar{
                        
                 }
                
-            }
+            }   
             return $band;
         }
         catch(PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************";  
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
 
@@ -46,7 +46,7 @@ class Validar{
                 return false;
         }
         catch(PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************";  
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
 
@@ -76,7 +76,7 @@ class Validar{
             return $band;
         }
         catch(PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************";  
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
 }

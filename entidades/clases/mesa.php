@@ -48,7 +48,7 @@ class Mesa {
             
         }
         catch( PDOException $e){
-            return  strtoupper($e->getMessage()) ; 
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
         }
      }
 
@@ -85,7 +85,7 @@ class Mesa {
             
         }
         catch( PDOException $e){
-            return  strtoupper($e->getMessage()) ; 
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
         }
      }
 }

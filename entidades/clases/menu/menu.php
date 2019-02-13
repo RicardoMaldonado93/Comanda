@@ -26,7 +26,7 @@ class Menu {
             
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()); 
+            return array( 'msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }
 

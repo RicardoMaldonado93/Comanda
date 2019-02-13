@@ -43,6 +43,7 @@ class PersonalApi extends Personal implements IPersonal{
     public static function CambiarPuesto( $request, $response, $args){
 
         $datos = $request->getParams();
+        
         $empleado = Personal::ModificarPuesto($datos['id'],$datos['puesto']);
 
         if($empleado != NULL) 

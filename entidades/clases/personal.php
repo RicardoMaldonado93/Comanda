@@ -19,13 +19,13 @@ class Personal  {
             $consulta->bindValue(':est', Estado::Activo, PDO::PARAM_STR);
 
             if($consulta->execute()==true)
-                return "---------> SE AGREGO CORRECTAMENTE EL EMPLEADO <---------";
+                return array('msg'=>"SE AGREGO CORRECTAMENTE EL EMPLEADO", 'type'=>'ok');
             
             else
                throw new PDOException("ERROR AL AGREGAR EL EMPLEADO");
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . $consulta->errorCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -33,7 +33,7 @@ class Personal  {
 
         try{
 
-                $v = Validar::Existe($codigo,'personal');
+                $v = Validar::Existe($id,'personal');
 
                 if($v== 1){
                    
@@ -45,7 +45,7 @@ class Personal  {
                     $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
                     $consulta->bindValue(':est', $estado, PDO::PARAM_STR);
                     if($consulta->execute() == true)
-                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                        return array('msg'=>"SE MODIFICO CORRECTAMENTE EL REGISTRO", 'type'=>'ok');
                     else
                         throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
                 }
@@ -64,14 +64,14 @@ class Personal  {
 
      catch( PDOException $e){
     
-        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
     public static function EliminarEmpleado($id){
 
         try{
-                $v = Validar::Existe($codigo,'personal');
+                $v = Validar::Existe($id,'personal');
         
                 if( $v === 1){
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
@@ -79,7 +79,7 @@ class Personal  {
                     $consulta->bindValue(':id',$id,PDO::PARAM_INT);
     
                     if($consulta->execute() == true)
-                        return " ---------> SE BORRO REGISTRO CORRECTAMENTE <---------<br>";
+                        return array('msg'=>"SE BORRO REGISTRO CORRECTAMENTE", 'type'=>'ok');
 
                     else
                         throw new PDOException("ERROR AL ELIMINAR EL REGISTRO");
@@ -97,7 +97,7 @@ class Personal  {
                 }
         }
         catch(PDOException $e){
-            return "*********** ERROR ***********<br>" . $e->getCode() .' : '. strtoupper($e->getMessage()) . "<br>******************************";  
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
 
@@ -115,7 +115,7 @@ class Personal  {
         }
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" . $consulta->errorCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }
 
@@ -147,7 +147,7 @@ class Personal  {
         }
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }
 
@@ -155,7 +155,7 @@ class Personal  {
 
         try{
 
-                $v = Validar::Existe($codigo,'personal');
+                $v = Validar::Existe($id,'personal');
 
                 if($v== 1){
                    
@@ -165,7 +165,7 @@ class Personal  {
                     $consulta->bindValue(':est', $estado, PDO::PARAM_STR);
 
                     if($consulta->execute() == true)
-                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                        return array('msg'=>"SE MODIFICO CORRECTAMENTE EL REGISTRO", 'type'=>'ok');
                     else
                         throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
                 }
@@ -184,7 +184,7 @@ class Personal  {
 
      catch( PDOException $e){
     
-        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -192,7 +192,7 @@ class Personal  {
 
         try{
 
-                $v = Validar::Existe($codigo,'personal');
+                $v = Validar::Existe($id,'personal');
 
                 if($v== 1){
                    
@@ -202,7 +202,7 @@ class Personal  {
                     $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);
                     
                     if($consulta->execute() == true)
-                        return " ---------> SE MODIFICO CORRECTAMENTE EL REGISTRO <---------<br>";
+                        return array('msg'=>"SE MODIFICO CORRECTAMENTE EL REGISTRO", 'type'=>'ok');
                     else
                         throw new PDOException ("ERROR AL MODIFICAR EL REGISTRO");    
                 }
@@ -221,7 +221,7 @@ class Personal  {
 
      catch( PDOException $e){
     
-        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -229,7 +229,7 @@ class Personal  {
 
         try{
 
-                $v = Validar::Existe($codigo,'personal');
+                $v = Validar::Existe($id,'personal');
 
                 if($v== 1){
                    
@@ -239,7 +239,7 @@ class Personal  {
                     $consulta->bindValue(':est', Estado::Suspendido, PDO::PARAM_STR);
                     
                     if($consulta->execute() == true)
-                        return " ---------> SE HA SUSPENDIDO AL EMPLEADO <---------<br>";
+                        return array('msg'=>"SE HA SUSPENDIDO AL EMPLEADO", 'type'=>'ok');
                     else
                         throw new PDOException ("ERROR AL SUSPENDER");    
                 }
@@ -258,7 +258,7 @@ class Personal  {
 
      catch( PDOException $e){
     
-        return "*********** ERROR ***********<br>" . $e->getCode() . ':'. strtoupper($e->getMessage()) . "<br>******************************"; 
+        return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 

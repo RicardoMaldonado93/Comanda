@@ -78,7 +78,7 @@ class Pedidos {
                         if($consulta->execute()==true){
                            // $respuesta->mensaje = "PEDIDO REALIZADO";
                             //$respuesta->codigo = $codigo;
-                            return "---------> SE REALIZO EL PEDIDO <---------<br><br>" ;// self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
+                            return array('msg'=>"SE REALIZO EL PEDIDO",'type'=>'ok') ;// self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
                             //return $respuesta;
                         }
                         else
@@ -88,10 +88,10 @@ class Pedidos {
                 }
                 
                 else
-                    throw new PDOException( Mesa::ocuparMesa($mesa));
+                    throw new PDOException( $v['msg']);
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -120,7 +120,7 @@ class Pedidos {
 
                 if($consulta->execute() == true)
                     if( self::ActualizarEstado($codigo) == true)
-                        return " ---------> EL PEDIDO SE ENCUENTRA EN PREPARACION <---------";
+                        return array('msg'=>"EL PEDIDO SE ENCUENTRA EN PREPARACION", 'type'=>'ok');
                 else
                     throw new PDOException ("ERROR AL PREPARAR EL PEDIDO");    
             }
@@ -139,7 +139,7 @@ class Pedidos {
 
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
             }
     }
 
@@ -157,7 +157,7 @@ class Pedidos {
                 $consulta->bindValue(':es', EPedido::Cancelado, PDO::PARAM_INT);
 
                 if($consulta->execute() == true)
-                    return " ---------> EN ". strtoupper($sector) . ": SE CANCELO EL PEDIDO <---------";
+                    return array('msg'=>"EN ". strtoupper($sector) . ": SE CANCELO EL PEDIDO.", 'type'=>'ok');
                 else
                     throw new PDOException ("ERROR AL CANCELAR EL PEDIDO");    
             }
@@ -176,7 +176,7 @@ class Pedidos {
 
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
             }
     }
 
@@ -188,13 +188,13 @@ class Pedidos {
             if($v== 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET estado=:es WHERE idProducto:id AND codigo =:cod");
+                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET estado=:es WHERE idProducto=:id AND codigo =:cod");
                 $consulta->bindValue(':id', $id, PDO::PARAM_INT);
                 $consulta->bindValue(':cod',$codigo, PDO::PARAM_STR);
                 $consulta->bindValue(':es', EPedido::ListoParaServir, PDO::PARAM_INT);
 
                 if($consulta->execute() == true)
-                    return " ---------> EN ". strtoupper($sector) . ": LISTO PARA SERVIR. <---------";
+                    return array('msg'=>"EN ". strtoupper($sector) . ": LISTO PARA SERVIR.", 'type'=>'ok');
                 else
                     throw new PDOException ("ERROR AL SERVIR EL PEDIDO");    
             }
@@ -213,7 +213,7 @@ class Pedidos {
 
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
             }
     }
 
@@ -236,7 +236,7 @@ class Pedidos {
 
                 if($consulta->execute() == true)
                     if(Mesa::estadoMesa($nroMesa[0], 2) == 1)
-                        return " ---------> SE REGISTRO ENTREGA <---------";
+                        return array('msg'=>"SE REGISTRO ENTREGA", 'type'=>'ok');
                     else
                         throw new PDOException(Mesa::estadoMesa($nroMesa,5));
                 else
@@ -257,7 +257,7 @@ class Pedidos {
 
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
             }
     }
 
@@ -289,7 +289,7 @@ class Pedidos {
         }
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -318,7 +318,7 @@ class Pedidos {
                 throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
     
@@ -336,7 +336,7 @@ class Pedidos {
                 }
 
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND p.estado = :es");
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre  FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = :es");
                 $consulta->bindValue(':es', $es, PDO::PARAM_INT);
             
                 if($consulta->execute()==true)
@@ -345,7 +345,7 @@ class Pedidos {
                     throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
     }
 
@@ -363,7 +363,7 @@ class Pedidos {
                 }
 
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM pedido p, menu m WHERE m.id = p.pedido AND m.sector = :se");
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre  FROM productopedido p, menu m WHERE m.id = p.idProducto AND m.sector = :se");
                 $consulta->bindValue(':se', $se, PDO::PARAM_INT);
             
                 if($consulta->execute()==true)
@@ -372,7 +372,7 @@ class Pedidos {
                     throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }
 
@@ -411,12 +411,7 @@ class Pedidos {
                         $t = "en proceso de entrega";
                     
                         if($pedido['mesa'] == $Cmesa[0]){ //verifico si la mesa coincide con el codigo
-                            return "<pre>******************** MI PEDIDO *********************<br><br>".
-                            " CODIGO: " . $cod . "<br>".
-                            " MESA : " . $mesa . "<br>".
-                            " MOZO : " . strtoupper($mozo[0]->{'apellido'})  . "<br>" . 
-                            "<br>****************************************************<br><br>".
-                            " DEMORA : " . $t. "<br>" ;
+                            return array('codigo'=> $cod, 'mesa'=>$mesa, 'mozo'=>$mozo[0]->{'apellido'}, 'demora'=>$t);
                         }
                         else
                             throw new Exception("LA MESA NO COINCIDE",400);
@@ -430,7 +425,7 @@ class Pedidos {
                     
         }
         catch( PDOException $e){
-            return "*********** ERROR ***********<br>" . strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }
 
@@ -458,7 +453,7 @@ class Pedidos {
 
     catch( PDOException $e){
 
-        return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+        return array('msg'=>strtoupper($e->getMessage()) ,'type'=>'error'); 
         }
 
     }
@@ -487,7 +482,7 @@ class Pedidos {
 
         catch( PDOException $e){
 
-            return "*********** ERROR ***********<br>" .  strtoupper($e->getMessage()) . "<br>******************************"; 
+            return array('msg'=>strtoupper($e->getMessage()),'type'=>"error"); 
             }
     }
     
@@ -522,17 +517,8 @@ class Pedidos {
         $codMozo= $Cmozo->fetch();
         $codCom= $Ccomida->fetch();
 
-        return "<pre><br>******************** TICKET DE COMPRA *********************<br><br>".
-                " FECHA : " . $fecha  . "<br> HORA : " . $hora .
-                "<br><br>***********************************************************<br><br>".
-                " CODIGO : " .  $codigo . "<br>" .
-                " MESA : " . $codMesa[0] . "<br>".
-                " MOZO : " . $codMozo[1] . "<br>" . 
-                "<br>***********************************************************<br><br>".
-                " PEDIDO : " .  strtoupper($codCom[0]) . "<br>".
-                " CANTIDAD : " . $cantidad . "<br>".
-                "<br>***********************************************************<br><br>".
-                " TOTAL : $" . $total ;
+        return array('fecha'=>$fecha, 'hora'=>$hora, 'codigo'=>$codigo, 'mesa'=>$codMesa[0], 'mozo'=>$codMozo[1], 
+                     'pedido'=>strtoupper($codCom[0]) , 'cantidad'=>$cantidad, 'total'=>$total);
 
         
     }

@@ -4,14 +4,10 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 require_once './composer/vendor/autoload.php';
-require_once './API/MenuApi.php';
-require_once './API/PersonalApi.php';
-require_once './API/PedidosApi.php';
-/*require_once './api/UsuarioApi.php';
-require_once './api/LoginApi.php';
-require_once './api/LogApi.php';
-require_once './api/CompraApi.php';
-require_once './clases/MWAuth.php';*/
+require_once './Api/MenuApi.php';
+require_once './Api/PersonalApi.php';
+require_once './Api/PedidosApi.php';
+
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
@@ -22,7 +18,7 @@ $app = new \Slim\App(["settings" => $config]);
 $app->group('/api' , function(){
     
     $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
-
+    
     $this->group('/empleado', function(){
 
         //ABM de empleados
@@ -47,7 +43,7 @@ $app->group('/api' , function(){
         $this->put('[/]', \PedidosApi::class . ':Preparar');
         //$this->put('/', \PedidosApi::class . ':ListoParaServir');
         $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
-        $this->put('/servir[/]', \PedidosApi::class . ':Servir');
+        $this->put('/servir[/]', \PedidosApi::class . ':ListoParaServir');
         $this->delete('/entregado', \PedidosApi::class . ':Entregar');
 
         //Listados de pedidos gral y por sector

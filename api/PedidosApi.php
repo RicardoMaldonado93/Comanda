@@ -22,7 +22,8 @@ class PedidosApi extends Pedidos implements IPedidos{
 
      }
 
-    public static function Preparar( $request, $response, $args){
+    
+     public static function Preparar( $request, $response, $args){
 
         $datos = $request->getParams();
         $pedido = Pedidos::prepararPedido($datos['id'],$datos['codigo'],$datos['demora']);
@@ -97,7 +98,7 @@ class PedidosApi extends Pedidos implements IPedidos{
                 case 'listos': {$pedido = Pedidos::traerEstado(3); break;}
                 case 'cancelados': {$pedido = Pedidos::traerEstado(4); break;}
 
-                default : { throw new Exception("ERROR DE RUTA", 404); }
+                default : { throw new Exception("ERROR DE RUTA!<br><br>rutas disponibles:<br> *pendientes<br>*enPreparacion<br>*listos<br>*cancelados ", 404); }
             }
             if($pedido != NULL) 
                 return $response->withJson($pedido, 200);
@@ -118,7 +119,7 @@ class PedidosApi extends Pedidos implements IPedidos{
                  case 'cerveceria': {$pedido = Pedidos::traerSector(1); break;}
                  case 'candybar': {$pedido = Pedidos::traerSector(4); break;}
  
-                 default : { throw new Exception("ERROR DE RUTA", 404); }
+                 default : { throw new Exception("ERROR DE RUTA!<br><br>rutas disponibles:<br> *cocina<br>*bartender<br>*cerveceria<br>*candybar ", 404); }
              }
              if($pedido != NULL) 
                  return $response->withJson($pedido, 200);
