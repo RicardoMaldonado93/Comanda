@@ -7,12 +7,15 @@ require_once './entidades/enums/estadoEmpleado.php';
 
 class Personal  {
 
-    public static function AgregarEmpleado($nom, $ape, $puesto){
+    public static function AgregarEmpleado($usuario, $pass, $nom, $ape, $puesto){
 
+        $op = ['cost' => 12 ];
         try{
-
+            
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO personal(nombre,apellido,puesto, estado) VALUES ( :nom, :ape, :pue, :est)");
+            $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO personal(usuario,pass,nombre,apellido,puesto, estado) VALUES ( :us, :pass, :nom, :ape, :pue, :est)");
+            $consulta->bindValue(':us', $usuario, PDO::PARAM_STR);
+            $consulta->bindValue(':pass', password_hash($pass,PASSWORD_BCRYPT,$op), PDO::PARAM_STR);
             $consulta->bindValue(':nom', $nom, PDO::PARAM_STR);
             $consulta->bindValue(':ape', $ape, PDO::PARAM_STR);
             $consulta->bindValue(':pue', $puesto, PDO::PARAM_STR);

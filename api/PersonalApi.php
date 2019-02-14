@@ -8,7 +8,7 @@ class PersonalApi extends Personal implements IPersonal{
     public static function Agregar($request, $response, $args){
         
         $datos= $request->getParsedBody();
-        $empleado = Personal::AgregarEmpleado($datos['nombre'], $datos['apellido'],$datos['puesto']);
+        $empleado = Personal::AgregarEmpleado($datos['usuario'],$datos['pass'],$datos['nombre'], $datos['apellido'],$datos['puesto']);
 
         if($empleado != NULL) 
             return $response->withJson($empleado, 200);
