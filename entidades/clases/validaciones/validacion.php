@@ -50,6 +50,17 @@ class Validar{
         }
     }
 
+    public static function verificar( $cel, $tab, $param){
+
+        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+
+        $verificar= $objetoAccesoDato->RetornarConsulta('SELECT '. $cel . ' ' .'FROM' .' '  . $tab . ' '.  'WHERE' .' ' . $cel . '=:param');
+        $verificar->bindValue(':param', $param, PDO::PARAM_STR);
+        $verificar->execute();
+        
+        return $verificar->fetchAll();
+    }
+
     public static function ExistePedido($codigo){
         try{
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();

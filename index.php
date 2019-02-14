@@ -4,9 +4,10 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 require_once './composer/vendor/autoload.php';
-require_once './Api/MenuApi.php';
-require_once './Api/PersonalApi.php';
-require_once './Api/PedidosApi.php';
+require_once './api/LoginApi.php';
+require_once './api/MenuApi.php';
+require_once './api/PersonalApi.php';
+require_once './api/PedidosApi.php';
 
 
 $config['displayErrorDetails'] = true;
@@ -16,6 +17,8 @@ $app = new \Slim\App(["settings" => $config]);
 
 
 $app->group('/api' , function(){
+
+    $this->post('/login[/]', \LoginApi::class . ':Login');
     
     $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
     
