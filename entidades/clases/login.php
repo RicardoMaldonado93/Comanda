@@ -21,12 +21,11 @@ class Login {
                             $consulta->execute();
                         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Login');
                     }
-                else
-                throw new PDOException("password invalido!");}
+                    else
+                        throw new PDOException("password invalido!");
+                }
             else
-                throw new PDOException("usuario no existente!");
- 
-        
+                throw new PDOException("usuario no existente!");        
             }
         catch (PDOException $e){
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
