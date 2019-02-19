@@ -70,8 +70,14 @@ class Validar{
             $band;
             
   
-            if( intval($verificar->fetchColumn()) == 1)
-                $band = 1;
+            if( intval($verificar->fetchColumn()) == 1){
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.* FROM pedido p Where p.codigo=:cod");
+                    $consulta->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                    
+                    if($consulta->execute()==true)
+                        $band = $consulta->fetch();
+            }
+                //$band = 1;
             else{
                 if($verificar->fetchColumn() == 0 ){
                     $v= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM pedido");

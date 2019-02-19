@@ -17,12 +17,11 @@ $config['addContentLengthHeader'] = true;
 $app = new \Slim\App(["settings" => $config]);
 
 $app->post('/api/login[/]', \LoginApi::class . ':Login');
+$app->get('/api/menu[/]', \MenuApi::class . ':MostrarMenu');
+$app->get('/api/miPedido', \PedidosApi::class . ':VerMiPedido');
+
 $app->group('/api' , function(){
 
-    #$this->post('/login[/]', \LoginApi::class . ':Login');
-    
-    $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
-    
     $this->group('/empleado', function(){
 
         //ABM de empleados
@@ -58,8 +57,8 @@ $app->group('/api' , function(){
       
     
     })->add(\MWAuth::class . ':Auth');
-    
-    $this->get('/miPedido', \PedidosApi::class . ':VerMiPedido');
+
+
 })->add(\LogApi::class . ':Registro');
 
 $app->run();
