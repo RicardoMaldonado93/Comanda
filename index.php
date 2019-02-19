@@ -26,7 +26,7 @@ $app->group('/api' , function(){
     $this->group('/empleado', function(){
 
         //ABM de empleados
-        $this->post('[/]', \PersonalApi::class . ':Agregar');
+        $this->post('[/]', \PersonalApi::class . ':Agregar')->add(\MWAuth::class . ':VerificarUsuario');
         $this->delete('[/]', \PersonalApi::class . ':Eliminar');
         $this->put('[/]', \PersonalApi::class . ':Modificar');
 

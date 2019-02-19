@@ -84,11 +84,20 @@ class MWAuth
                 if( $status ){
 
                     $payload =Token::ObtenerData($token[0]);
-				
-                    if($payload[0]->{'puesto'} == 'Socio')
-                        return $next($request,$response);
+
+                    if(strtolower($payload[0]->{'estado'}) != 'suspendido' and strtolower($payload[0]->{'estado'}) != 'inactivo'){
+                        if($payload[0]->{'puesto'} == 'Socio')
+                            return $next($request,$response);
+                        else
+                            return $response->withJson('ACCESO RESTRINGIDO', 401);
+                        }
                     else
-                        return $response->withJson('ACCESO RESTRINGIDO', 401);
+                    {
+                        if(strtolower($payload[0]->{'estado'}) == 'suspendido')
+                            return $response->withJson('SU CUENTA SE ENCUENTRA SUSPENDIDA, COMUNIQUESE CON EL ADMINISTRADOR',401);
+                        else
+                            return $response->withJson('SU CUENTA SE ENCUENTRA INACTIVA, COMUNIQUESE CON EL ADMINISTRADOR',401);
+                    }
                 }
                 
         }
