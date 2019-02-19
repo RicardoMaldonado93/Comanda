@@ -8,8 +8,10 @@ class LogApi extends Log implements ILog{
     public static function Registro($request, $response, $next){
        
         try{
-            $token = $request->getHeader('token');
-            $status = Token::VerificarToken($token[0]);
+             
+            if($request->getHeader('token') != NULL){
+                $token = $request->getHeader('token');
+                $status = Token::VerificarToken($token[0]);
 
                 if( $status ){
             
@@ -24,6 +26,9 @@ class LogApi extends Log implements ILog{
                 }
             
             return $next($request,$response);
+            }
+            else
+                throw new Exception('ERROR AL INTENTAR CARGAR TOKEN');
                 
         }
 
