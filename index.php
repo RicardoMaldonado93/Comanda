@@ -8,10 +8,10 @@ require_once './api/LoginApi.php';
 require_once './api/MenuApi.php';
 require_once './api/PersonalApi.php';
 require_once './api/PedidosApi.php';
-
+require_once './api/LogApi.php';
 
 $config['displayErrorDetails'] = true;
-$config['addContentLengthHeader'] = false;
+$config['addContentLengthHeader'] = true;
 
 $app = new \Slim\App(["settings" => $config]);
 
@@ -59,7 +59,7 @@ $app->group('/api' , function(){
     });
     
     $this->get('/miPedido', \PedidosApi::class . ':VerMiPedido');
-});
+})->add(\LogApi::class . ':Registro');
 
 $app->run();
 ?>
