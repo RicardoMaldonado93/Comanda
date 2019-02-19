@@ -9,16 +9,17 @@ require_once './api/MenuApi.php';
 require_once './api/PersonalApi.php';
 require_once './api/PedidosApi.php';
 require_once './api/LogApi.php';
+require_once './entidades/clases/auth.php';
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = true;
 
 $app = new \Slim\App(["settings" => $config]);
 
-
+$app->post('/api/login[/]', \LoginApi::class . ':Login');
 $app->group('/api' , function(){
 
-    $this->post('/login[/]', \LoginApi::class . ':Login');
+    #$this->post('/login[/]', \LoginApi::class . ':Login');
     
     $this->get('/menu[/]', \MenuApi::class . ':MostrarMenu');
     
@@ -37,7 +38,7 @@ $app->group('/api' , function(){
         $this->put('/suspender[/]', \PersonalApi::class . ':Suspender');
         $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
         $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
-    });
+    })->add(\MWAuth::class . ':Auth');
 
     $this->group('/pedido', function(){
 
@@ -56,7 +57,7 @@ $app->group('/api' , function(){
         $this->get('/sector/{se}[/]', \PedidosApi::class . ':MostrarSector');
       
     
-    });
+    })->add(\MWAuth::class . ':Auth');
     
     $this->get('/miPedido', \PedidosApi::class . ':VerMiPedido');
 })->add(\LogApi::class . ':Registro');

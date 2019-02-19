@@ -108,7 +108,7 @@ class Personal  {
         try{
 
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM personal");
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT ID,usuario,puesto,estado,nombre,apellido FROM personal");
             
             
             if($consulta->execute()==true)

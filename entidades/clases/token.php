@@ -18,7 +18,7 @@ class Token{
             "aud" => self::Aud(),
             "data" => $param,
             "iat" => $hora,
-            "exp" => $hora + 120,
+            "exp" => $hora + 3600,
             "nbf" => 1357000000
         );
         
@@ -54,7 +54,7 @@ class Token{
              
         } catch (Exception $e) {
             
-            throw new Exception(array('msg'=>strtoupper($e->getMessage()),'type'=>'error'));
+            throw new Exception(strtoupper($e->getMessage()));
     
         } 
        
