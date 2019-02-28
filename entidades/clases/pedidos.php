@@ -10,46 +10,56 @@ class Pedidos {
 
     public static function cargarPedido($mesa, $mozo, $lista_pedido, $cliente){
         
-        date_default_timezone_set("America/Argentina/Buenos_Aires");
         try{
-                $v = Mesa::ocuparMesa($mesa); //Verifico si la mesa esta cerrada.
+            
+                date_default_timezone_set("America/Argentina/Buenos_Aires"); #seteo el timezone para la fecha y hora
+                $v = Mesa::ocuparMesa($mesa); #verifica si la mesa esta cerrada
                 $band = false;
-               // var_dump($lista_pedido);
+
                 
                 if($v == 1){
 
-                    //cargo los pedidos pasados en el json
+                    #cargo los pedidos pasados en el json
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                    
-                    $codigo = self::generarCodigo();
+                    
                     $hora = date("H:i:s");
                     $fecha = date("Y-m-d");
-                    
-                    foreach( $lista_pedido as $pedido ){
+                    $codigo = self::generarCodigo(); #genero un codigo aleatorio alfanumerico de 5 caracteres
+
+                    foreach( $lista_pedido as $pedido ){ #recorro la lista de pedidos para poder cargarlos
                         
                        
                         if(isset($pedido)){
-                            $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $pedido->{'cantidad'} . " as Total FROM menu  WHERE ID=:id ");
-                            $Ctotal->bindValue(':id', $pedido->{'id'}, PDO::PARAM_INT);
-                            $Ctotal->execute();
-                            $total =  $Ctotal->fetch();
-                            
-                            $CP = $objetoAccesoDato->RetornarConsulta("INSERT INTO productopedido( codigo, idProducto , cantidad, estado, total, horaInicio, fecha)
-                                                                        VALUES ( :cod, :iP, :cant, :est, :tot, :hi, :fe)");
+                            if(Validar::verificar('id','menu',$pedido->{'id'}) != Null){ #verifico si existe el producto
 
-                            $CP->bindValue(':cod', $codigo , PDO::PARAM_STR);
-                            $CP->bindValue(':iP', $pedido->{'id'}, PDO::PARAM_INT);
-                            $CP->bindValue(':cant', $pedido->{'cantidad'}, PDO::PARAM_INT);
-                            $CP->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
-                            $CP->bindValue(':tot', $total[0] , PDO::PARAM_STR);
-                            $CP->bindValue(':hi', $hora , PDO::PARAM_STR);
-                            $CP->bindValue(':fe', $fecha , PDO::PARAM_STR);
-                            
-                            //si se cargo correctamente el producto cambio el valor de la bandera a true de lo contrario false;
-                            if($CP->execute())
-                                $band = true; 
+                                #si existe el producto calculo el costo total del producto pedido de forma individual
+                                $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $pedido->{'cantidad'} . " as Total FROM menu  WHERE ID=:id ");
+                                $Ctotal->bindValue(':id', $pedido->{'id'}, PDO::PARAM_INT);
+                                $Ctotal->execute();
+                                $total =  $Ctotal->fetch();
+                                
+                                #aca se agrega el producto pedido para la preparacion
+                                $CP = $objetoAccesoDato->RetornarConsulta("INSERT INTO productopedido( codigo, idProducto , cantidad, estado, total, horaInicio, fecha)
+                                                                            VALUES ( :cod, :iP, :cant, :est, :tot, :hi, :fe)");
+
+                                $CP->bindValue(':cod', $codigo , PDO::PARAM_STR);
+                                $CP->bindValue(':iP', $pedido->{'id'}, PDO::PARAM_INT);
+                                $CP->bindValue(':cant', $pedido->{'cantidad'}, PDO::PARAM_INT);
+                                $CP->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                                $CP->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                                $CP->bindValue(':hi', $hora , PDO::PARAM_STR);
+                                $CP->bindValue(':fe', $fecha , PDO::PARAM_STR);
+                                
+                                #si se cargo correctamente el producto cambio el valor de la bandera 
+                                #a true de lo contrario false;
+                                if($CP->execute())
+                                    $band = true; 
+                                else
+                                    $band = false;
+                            }
                             else
-                                $band = false;
+                                throw new Exception(strtoupper('no existe el producto con el id: ' . $pedido->{'id'}));
                         }
                         else
                             break;
@@ -57,12 +67,13 @@ class Pedidos {
 
                     if($band){
 
+                        #si se realizo la carga de/los productos calculo el total de la compra
                         $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT SUM(total) as Total FROM productopedido  WHERE codigo=:cod ");
                         $Ctotal->bindValue(':cod', $codigo, PDO::PARAM_STR);
                         $Ctotal->execute();
                         $total =  $Ctotal->fetch();
 
-                        //de ser la bandera verdadera, cargo el pedido a la base de datos
+                        #cargo la venta con los datos correspondientes
                         $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(codigo, cliente, mesa , mozo, estado, total, horaInicio, fecha) VALUES ( :cod, :nom, :me, :mo, :est, :tot, :hi, :fe)");
 
                         $consulta->bindValue(':cod', $codigo , PDO::PARAM_STR);
@@ -76,10 +87,7 @@ class Pedidos {
 
                         
                         if($consulta->execute()==true){
-                           // $respuesta->mensaje = "PEDIDO REALIZADO";
-                            //$respuesta->codigo = $codigo;
-                            return array('msg'=>"SE REALIZO EL PEDIDO",'type'=>'ok') ;// self::CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total[0], $hora, $fecha) ;
-                            //return $respuesta;
+                            return array('msg'=>"SE REALIZO EL PEDIDO",'type'=>'ok', 'codigo'=>$codigo) ;
                         }
                         else
                             throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
@@ -100,7 +108,7 @@ class Pedidos {
 
             $v = Validar::ExistePedido($codigo);
 
-            if($v== 1){
+            if($v != 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 
@@ -129,9 +137,10 @@ class Pedidos {
             {
 
                 if($v == -1)
-                    throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    throw new PDOException("NINGUN REGISTRO A BORRAR",405);
                 else 
-                    throw new PDOException("NO EXISTE REGISTRO",4404);
+                    throw new PDOException("NO EXISTE REGISTRO",404); 
+                    
             
 
             }
@@ -178,14 +187,15 @@ class Pedidos {
 
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
             }
-    }
+     }
 
-    public static function pedidoListo($id, $codigo, $sector){
+    
+     public static function pedidoListo($id, $codigo, $sector){
         try{
 
             $v = Validar::ExistePedido($codigo);
 
-            if($v== 1){
+            if($v!= 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE productopedido SET estado=:es WHERE idProducto=:id AND codigo =:cod");
@@ -222,7 +232,7 @@ class Pedidos {
 
             $v = Validar::ExistePedido($codigo);
 
-            if($v== 1){
+            if($v!= 1){
                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 $mesa = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM mesa m, pedido p WHERE p.ID =:cod AND m.id = p.mesa");
@@ -247,9 +257,9 @@ class Pedidos {
             {
 
                 if($v == -1)
-                    throw new PDOException("NINGUN REGISTRO A BORRAR",4405);
+                    throw new PDOException("NINGUN REGISTRO A BORRAR",405);
                 else 
-                    throw new PDOException("NO EXISTE REGISTRO",4404);
+                    throw new PDOException("NO EXISTE REGISTRO",405);
             
 
             }
@@ -443,17 +453,16 @@ class Pedidos {
                 return true;
             else
                 throw new PDOException ("ERROR AL ACTUALIZAR EL PEDIDO");    
-        
-    }
+        }
+        catch( PDOException $e){
 
-    catch( PDOException $e){
-
-        return array('msg'=>strtoupper($e->getMessage()) ,'type'=>'error'); 
+            return array('msg'=>strtoupper($e->getMessage()) ,'type'=>'error'); 
         }
 
-    }
+     }
 
-    private static function ActualizarEstado($codigo){
+    
+     private static function ActualizarEstado($codigo){
         try{
               
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
@@ -519,5 +528,92 @@ class Pedidos {
     }
 
 
+    public static function agregarPedido($codigo,$lista_pedido){
+
+        date_default_timezone_set("America/Argentina/Buenos_Aires");
+
+        try{
+                $v = Validar::ExistePedido($codigo); #verifica si existe el pedido
+                $band = false;
+             
+                
+                if($v != null ){
+
+                    #cargo los pedidos pasados en el json
+                    $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                    $hora = date("H:i:s");
+                    $fecha = date("Y-m-d");
+                    
+                    foreach( $lista_pedido as $pedido ){ #recorro la lista de pedidos para poder cargarlos
+                        
+                       
+                        if(isset($pedido)){
+                            if(Validar::verificar('id','menu',$pedido->{'id'}) != Null){ #verifico si existe el producto
+                                $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT precio * " . $pedido->{'cantidad'} . " as Total FROM menu  WHERE ID=:id ");
+                                $Ctotal->bindValue(':id', $pedido->{'id'}, PDO::PARAM_INT);
+                                $Ctotal->execute();
+                                $total =  $Ctotal->fetch();
+                                
+                                $CP = $objetoAccesoDato->RetornarConsulta("INSERT INTO productopedido( codigo, idProducto , cantidad, estado, total, horaInicio, fecha)
+                                                                            VALUES ( :cod, :iP, :cant, :est, :tot, :hi, :fe)");
+
+                                $CP->bindValue(':cod', $codigo , PDO::PARAM_STR);
+                                $CP->bindValue(':iP', $pedido->{'id'}, PDO::PARAM_INT);
+                                $CP->bindValue(':cant', $pedido->{'cantidad'}, PDO::PARAM_INT);
+                                $CP->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                                $CP->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                                $CP->bindValue(':hi', $hora , PDO::PARAM_STR);
+                                $CP->bindValue(':fe', $fecha , PDO::PARAM_STR);
+                                
+                                #si se cargo correctamente el producto cambio el valor de la bandera 
+                                #a true de lo contrario false;
+                                if($CP->execute())
+                                    $band = true; 
+                                else
+                                    $band = false;
+                            }
+                            else
+                                throw new Exception(strtoupper('no existe el producto con el id: ' . $pedido->{'id'}));
+                        }
+                        else
+                            break;
+                    }
+
+                    if($band){
+
+                        $Ctotal = $objetoAccesoDato->RetornarConsulta("SELECT SUM(total) as Total FROM productopedido  WHERE codigo=:cod ");
+                        $Ctotal->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                        $Ctotal->execute();
+                        $total =  $Ctotal->fetch();
+
+                        //de ser la bandera verdadera, cargo el pedido a la base de datos
+                        $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO pedido(codigo, cliente, mesa , mozo, estado, total, horaInicio, fecha) VALUES ( :cod, :nom, :me, :mo, :est, :tot, :hi, :fe)");
+
+                        $consulta->bindValue(':cod', $codigo , PDO::PARAM_STR);
+                        $consulta->bindValue(':nom', $v[0]->{'cliente'}, PDO::PARAM_STR);
+                        $consulta->bindValue(':me', $v[0]->{'mesa'}, PDO::PARAM_INT);
+                        $consulta->bindValue(':mo', $v[0]->{'mozo'}, PDO::PARAM_INT);
+                        $consulta->bindValue(':est', EPedido::Pendiente , PDO::PARAM_INT);
+                        $consulta->bindValue(':tot', $total[0] , PDO::PARAM_STR);
+                        $consulta->bindValue(':hi', $hora , PDO::PARAM_STR);
+                        $consulta->bindValue(':fe', $fecha , PDO::PARAM_STR);
+
+                        
+                        if($consulta->execute()==true){
+                            return array('msg'=>"SE REALIZO EL AGREGADO AL PEDIDO",'type'=>'ok') ;
+                        }
+                        else
+                            throw new PDOException("ERROR AL REALIZAR PEDIDO",404);
+                        }
+            
+                }
+                
+                else
+                    throw new PDOException( $v['msg']);
+        }
+        catch( PDOException $e){
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
+        }
+    }
 }
 ?>

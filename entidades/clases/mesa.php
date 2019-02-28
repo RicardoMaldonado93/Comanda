@@ -50,7 +50,7 @@ class Mesa {
         catch( PDOException $e){
             return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
         }
-     }
+    }
 
     public static function estadoMesa($nroMesa, $estado){
 
@@ -87,6 +87,48 @@ class Mesa {
         catch( PDOException $e){
             return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
         }
-     }
+    }
+
+    public static function mayorImporte(){
+        try{
+        
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT total, mesa.codigo FROM (SELECT total, m.id, p.mesa
+                                        FROM pedido p, mesa m where m.id = p.mesa) pedido, mesa where mesa.id = pedido.mesa
+                                        GROUP BY total DESC LIMIT 5");
+
+                if($consulta->execute()==true)
+                    return $consulta->fetch();
+                            
+        }
+        catch( PDOException $e){
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
+        }
+
+    }
+
+    public static function verMesas(){
+        try{
+                
+                $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM mesa ");
+                
+                if($consulta->execute()==true)
+                    return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+        }
+        catch( PDOException $e){
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
+        }
+    }
+
+  /*  public static function verMasUsada(){
+        try{
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM mesa ");
+            
+            if($consulta->execute()==true)
+                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+        }
+    }*/
 }
 ?>

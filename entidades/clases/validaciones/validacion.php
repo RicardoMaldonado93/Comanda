@@ -67,7 +67,7 @@ class Validar{
             $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM pedido WHERE codigo = :id");
             $verificar->bindValue(':id', $codigo, PDO::PARAM_STR);
             $verificar->execute();
-            $band;
+           // $band;
             
   
             if( intval($verificar->fetchColumn()) == 1){
@@ -75,22 +75,22 @@ class Validar{
                     $consulta->bindValue(':cod', $codigo, PDO::PARAM_STR);
                     
                     if($consulta->execute()==true)
-                        $band = $consulta->fetch();
+                        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Validar'); #si encuentra el registro devuelve los datos del registro
             }
-                //$band = 1;
+                
             else{
-                if($verificar->fetchColumn() == 0 ){
+                /*if($verificar->fetchColumn() == 0 ){
                     $v= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM pedido");
                     $v->execute();
                     if($v->fetchColumn()!=0)
                         $band = 0;
                     else
-                        $band = -1;
-                       
+                        $band = -1;*/
+                       return null;
                 }
                
-            }
-            return $band;
+            //}
+            //return $band;
         }
         catch(PDOException $e){
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  

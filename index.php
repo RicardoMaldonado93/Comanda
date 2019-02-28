@@ -9,6 +9,7 @@ require_once './api/MenuApi.php';
 require_once './api/PersonalApi.php';
 require_once './api/PedidosApi.php';
 require_once './api/LogApi.php';
+require_once './api/MesasApi.php';
 require_once './entidades/clases/auth.php';
 
 $config['displayErrorDetails'] = true;
@@ -37,6 +38,7 @@ $app->group('/api' , function(){
         $this->put('/suspender[/]', \PersonalApi::class . ':Suspender');
         $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
         $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
+
     })->add(\MWAuth::class . ':Auth');
 
     $this->group('/pedido', function(){
@@ -48,16 +50,37 @@ $app->group('/api' , function(){
         $this->put('/cancelar[/]', \PedidosApi::class . ':Cancelar');
         $this->put('/servir[/]', \PedidosApi::class . ':ListoParaServir');
         $this->delete('/entregado', \PedidosApi::class . ':Entregar');
+        $this->put('/agregar[/]', \PedidosApi::class . ':AgregarAPedido');
 
         //Listados de pedidos gral y por sector
         $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
         $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');
         $this->get('/estado/{es}[/]', \PedidosApi::class . ':MostrarEstado');
         $this->get('/sector/{se}[/]', \PedidosApi::class . ':MostrarSector');
-      
     
     })->add(\MWAuth::class . ':Auth');
 
+    $this->group('/mesa', function(){
+
+        $this->post('[/]', \MesasApi::class . ':AgregarMesa');
+        $this->put('[/]', \MesasApi::class . ':ModificarMesa');
+        $this->delete('[/]', \MesasApi::class . ':EliminarMesa');
+
+        $this->group('/listado', function(){
+        
+            $this->get('[/]', \MesasApi::class . ':MostrarMesas');
+            $this->get('/mayorImporte[/]', \MesasApi::class . ':MostrarMayorImporte'); #muestra 1 o mas mesas con mayor importe
+            $this->get('/mayorFacturacion[/]',\MesasApi::class . ':MostrarMayorFacturacion');
+            $this->get('/mayorCalificacion[/]', \MesasApi::class . ':MostrarMayorCalificacion');
+            $this->get('/masUsada[/]', \MesasApi::class . ':MostrarMasUsada');
+
+            $this->get('/menorImporte[/]', \MesasApi::class . ':MostrarMenorImporte');
+            $this->get('/menorFacturacion[/]', \MesasApi::class . ':MostrarMenorFacturacion');
+            $this->get('/menorCalificacion[/]', \MesaApi::class . ':MostrarMenorCalificacion');
+            $this->get('/menosUsada[/]', \MesaApi::class . ':MostrarMenosUsada');
+        });
+
+    });
 
 })->add(\LogApi::class . ':Registro');
 

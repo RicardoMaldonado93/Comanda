@@ -1,0 +1,6 @@
+SELECT total, mesa.codigo
+FROM (SELECT total, m.id, p.mesa
+          FROM pedido p, mesa m where m.id = p.mesa) pedido, mesa where mesa.id = pedido.mesa
+GROUP BY total DESC LIMIT 2
+
+###codigo sql para buscar las 2 mayores recaudaciones

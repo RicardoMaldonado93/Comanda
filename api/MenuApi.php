@@ -10,12 +10,11 @@ class MenuApi extends Menu implements IMenu{
         $menu= Menu::mostrar();
 
         if($menu != NULL)
-            $newResponse = $response->withJson($menu, 200);
+            return $response->withJson($menu, 200);
         
         else 
-            $newResponse = $response->withJson($menu, 400);
+            return $response->withJson($menu, 400);
 
-        return $newResponse;
 
     }
 }
