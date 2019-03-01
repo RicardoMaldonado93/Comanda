@@ -237,31 +237,54 @@ class Pedidos {
             $v = Validar::ExistePedido($codigo);
 
             if($v!= 1){
-               
+                
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $mesa = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM mesa m, pedido p WHERE p.ID =:cod AND m.id = p.mesa");
-                $mesa->bindValue(':cod', $codigo, PDO::PARAM_STR);
-                $mesa->execute();
-                $nroMesa = $mesa->fetch();
 
-                $consulta =$objetoAccesoDato->RetornarConsulta("UPDATE pedido SET estado=:es WHERE ID LIKE :id");
-                $consulta->bindValue(':id',$codigo, PDO::PARAM_STR);
-                $consulta->bindValue(':es', EPedido::Entregado, PDO::PARAM_INT);
+                #devuelve la cantidad de elementos que tiene la orden quitando los ya entregados y los cancelados
+                $cons = $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM productopedido WHERE codigo=:cod AND estado !=4 AND estado!=5"); 
+                $cons->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                $cons->execute();
+                $cantPedido = $cons->fetch();
 
-                if($consulta->execute() == true)
-                    if(Mesa::estadoMesa($nroMesa[0], 2) == 1)
-                        return array('msg'=>"SE REGISTRO ENTREGA", 'type'=>'ok');
+                #devuelve la cantidad de elementos listos que tiene la orden
+                $cons = $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM productopedido WHERE codigo =:cod AND estado = 3");
+                $cons->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                $cons->execute();
+                $cantListos = $cons->fetch();
+                
+
+                if( $cantPedido == $cantListos){
+                    
+                    #obtengo el nro de mesa para cambair mas adelante el estado
+                    $mesa = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM mesa m, pedido p WHERE p.ID =:cod AND m.id = p.mesa");
+                    $mesa->bindValue(':cod', $codigo, PDO::PARAM_STR);
+                    $mesa->execute();
+                    $nroMesa = $mesa->fetch();
+
+                    #actualizo estado de todos los pedidos y la orden
+                    $consulta =$objetoAccesoDato->RetornarConsulta('UPDATE productopedido pp, pedido p SET p.estado=5, pp.estado=5 
+                                                                    WHERE p.codigo="'. $codigo .'"' .
+                                                                    'AND pp.codigo="' . $codigo .'"'. 'AND pp.estado !=4');
+
+                    if($consulta->execute() == true)
+                        if(Mesa::estadoMesa($nroMesa[0], 2) == 1)#cambio el estado de la mesa
+                            return array('msg'=>"SE REGISTRO ENTREGA", 'type'=>'ok');
+                        else
+                            throw new PDOException(Mesa::estadoMesa($nroMesa,5));
                     else
-                        throw new PDOException(Mesa::estadoMesa($nroMesa,5));
-                else
-                    throw new PDOException ("ERROR AL REGISTRAR ENTREGA");    
+                        throw new PDOException ("ERROR AL REGISTRAR ENTREGA");    
+                }
+
+                else{
+                    throw new PDOException ("NO SE PUEDE REALIZAR LA ENTREGA, HAY PRODUCTOS PENDIENTES A PREPARAR", 400);
+                }
             }
 
              else
             {
 
                 if($v == -1)
-                    throw new PDOException("NINGUN REGISTRO A BORRAR",405);
+                    throw new PDOException("NINGUN REGISTRO A ENTREGAR",405);
                 else 
                     throw new PDOException("NO EXISTE REGISTRO",405);
             
@@ -294,9 +317,9 @@ class Pedidos {
             {
 
                 if($v == -1)
-                    throw new PDOException("NINGUN PEDIDO A MOSTRAR",4405);
+                    throw new PDOException("NINGUN PEDIDO A MOSTRAR",400);
                 else 
-                    throw new PDOException("NO EXISTE PEDIDO",4404);
+                    throw new PDOException("NO EXISTE PEDIDO",400);
             
 
             }
@@ -311,14 +334,17 @@ class Pedidos {
 
         try{
             
-            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta=[];
-            $lista=array('PENDIENTES'=>[], 'EN PREPARACION'=>[]);
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();        
+            $lista=array();
 
             for( $i=0; $i<=4; $i++){
+
+                #realizo la consulta buscando por estado
                 $consulta[$i] = $objetoAccesoDato->RetornarConsulta('SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado ='  . ($i+1) .'' );
+               
                 if($consulta[$i]->execute()==true){
-                    switch($i){
+
+                    switch($i){ #variando el estado creo un array con los pedidos correspondientes y lo agrego a lista
                         case 0: { $lista['PENDIENTES'] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
                         case 1: { $lista['EN PREPARACION'] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
                         case 2: { $lista["PARA SERVIR"] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
@@ -344,6 +370,7 @@ class Pedidos {
                 $es; $cabecera;
                 switch(strtoupper($estado)){
 
+                    #dependiendo del valor ingresado se setea la cabecera para buscar el estado
                     case '1': { $es = 1; $cabecera = "PENDIENTES"; break;}
                     case '2': { $es = 2; $cabecera = "EN PREPARACION"; break;}
                     case '3': { $es = 3; $cabecera = "LISTOS PARA SERVIR"; break;}
@@ -351,11 +378,13 @@ class Pedidos {
 
                 }
 
+                #busco los pedidos con el estado seteado en cabecera
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre  FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = :es");
                 $consulta->bindValue(':es', $es, PDO::PARAM_INT);
             
                 if($consulta->execute()==true)
+                    #retorno dicha lista con los pedidos registrados
                     return array( $cabecera =>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));         
                 else
                     throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
@@ -371,6 +400,7 @@ class Pedidos {
                 $se; $cabecera;
                 switch(strtoupper($estado)){
 
+                    #dependiendo del valor ingresado se setea cabecera para realizar la busqueda
                     case '1': { $se = 1; $cabecera = "CERVECERIA"; break; }
                     case '2': { $se = 2; $cabecera = "COCINA"; break; }
                     case '3': { $se = 3; $cabecera = "BARTENDER"; break; }
@@ -378,11 +408,13 @@ class Pedidos {
 
                 }
 
+                #realizo la lista con el valor seteado en cabecera
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                 $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre  FROM productopedido p, menu m WHERE m.id = p.idProducto AND m.sector = :se");
                 $consulta->bindValue(':se', $se, PDO::PARAM_INT);
             
                 if($consulta->execute()==true)
+                    #retorno la correspondiente lista
                     return array( $cabecera =>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));         
                 else
                     throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
@@ -440,6 +472,8 @@ class Pedidos {
         }
     }
 
+
+    #ver que quise hacer aca
     public static function servirPedido($codigo){
         try{
               
@@ -527,6 +561,7 @@ class Pedidos {
         $codMozo= $Cmozo->fetch();
         $codCom= $Ccomida->fetch();
 
+        #genero un ticket con el detalle de la compra
         return array('fecha'=>$fecha, 'hora'=>$hora, 'codigo'=>$codigo, 'mesa'=>$codMesa[0], 'mozo'=>$codMozo[1], 
                      'pedido'=>strtoupper($codCom[0]) , 'cantidad'=>$cantidad, 'total'=>$total);
 

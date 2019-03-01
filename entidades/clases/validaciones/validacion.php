@@ -32,6 +32,20 @@ class Validar{
         }
     }
 
+    public static function cantidadElementos($codigo, $tabla){
+        try{
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+            $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(*) FROM ". $tabla ." WHERE codigo= :id");
+            $verificar->bindValue(':id', $codigo, PDO::PARAM_INT);
+            $verificar->execute();
+            
+            return $verificar->fetch();
+        }
+        catch(PDOException $e){
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
+        }
+    }
+
     public static function Ver($id, $param, $tabla, $columna){
         try{
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
