@@ -6,6 +6,8 @@ require_once './entidades/clases/validaciones/validacion.php';
 require_once './entidades/clases/personal.php';
 require_once './entidades/clases/mesa.php';
 
+
+
 class Pedidos {
 
     public static function cargarPedido($mesa, $mozo, $lista_pedido, $cliente){
@@ -87,6 +89,8 @@ class Pedidos {
 
                         
                         if($consulta->execute()==true){
+                            #si se realizo correctamente la consulta retorno un array notificando la correcta operacion 
+                            #y el codigo alfanumerico del pedido
                             return array('msg'=>"SE REALIZO EL PEDIDO",'type'=>'ok', 'codigo'=>$codigo) ;
                         }
                         else
@@ -106,7 +110,7 @@ class Pedidos {
     public static function prepararPedido($id, $codigo, $demora){
         try{
 
-            $v = Validar::ExistePedido($codigo);
+            $v = Validar::ExistePedido($codigo); #verifico si existe el pedido con el codigo ingresado
 
             if($v != 1){
                
@@ -306,26 +310,28 @@ class Pedidos {
     public static function traerPedidos(){
 
         try{
-
-            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 1");
-            $consulta2 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 2");
-            $consulta3 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 3");
-            $consulta4 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 4");
-            $consulta5 = $objetoAccesoDato->RetornarConsulta("SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado = 5");
             
-            if($consulta->execute()==true && $consulta2->execute()==true && $consulta3->execute()==true && $consulta4->execute()==true && $consulta5->execute()==true){
-                $pe = array( "PENDIENTES"=>$consulta->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
-                $pre = array( "EN PREPARACION"=> $consulta2->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
-                $li = array( "PARA SERVIR"=> $consulta3->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
-                $ca = array( "CANCELADOS"=>$consulta4->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
-                $en = array( "ENTREGADOS"=>$consulta5->fetchAll(PDO::FETCH_CLASS, 'Pedidos'));
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta=[];
+            $lista=array('PENDIENTES'=>[], 'EN PREPARACION'=>[]);
 
-
-                return $pe + $pre + $li + $ca + $en;
+            for( $i=0; $i<=4; $i++){
+                $consulta[$i] = $objetoAccesoDato->RetornarConsulta('SELECT p.*, m.nombre as pedido FROM productopedido p, menu m WHERE m.id = p.idProducto AND p.estado ='  . ($i+1) .'' );
+                if($consulta[$i]->execute()==true){
+                    switch($i){
+                        case 0: { $lista['PENDIENTES'] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
+                        case 1: { $lista['EN PREPARACION'] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
+                        case 2: { $lista["PARA SERVIR"] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
+                        case 3: { $lista["CANCELADOS"] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
+                        case 4: { $lista["ENTREGADOS"] = $consulta[$i]->fetchAll(PDO::FETCH_CLASS, 'Pedidos'); break;}
+                    }
+                    
+                }
+                else
+                    throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
             }
-            else
-                throw new PDOException("ERROR AL MOSTRAR PEDIDOS");
+                return $lista; 
+         
         }
         catch( PDOException $e){
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
