@@ -107,6 +107,7 @@ class Pedidos {
         }
     }
 
+    #
     public static function prepararPedido($id, $codigo, $demora){
         try{
 
@@ -156,6 +157,7 @@ class Pedidos {
             }
     }
 
+    #
     public static function cancelarPedido($id, $codigo, $sector){
         try{
 
@@ -231,6 +233,7 @@ class Pedidos {
             }
     }
 
+    #
     public static function entregarPedido($codigo){
         try{
 
@@ -298,6 +301,7 @@ class Pedidos {
             }
     }
 
+    #
     public static function traerPedido($codigo){
         try{
 
@@ -424,55 +428,6 @@ class Pedidos {
         }
     }
 
-    public static function verEstadoPedido($cod, $mesa){
-
-        try{
-                date_default_timezone_set("America/Argentina/Buenos_Aires");
-                $actual = date('y-m-d H:i:s');
-                $v = Validar::ExistePedido($cod); #si el codigo existe me devuelte todo el pedido para poder mostrar
-                    
-                if($v != 0 && $v != -1){
-
-                        $personal = Personal::MostrarX($v['mozo']); #a partir del id del mozo busco sus datos
-                        $mozo= $personal[0]->{'apellido'};  #cargo el apellido del mozo para mostrar 
-                        $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                                               
-                        #en el siguiente procedimiento me encargo de buscar si el codigo junto al numero de mesa coinciden con la informacion del 
-                        #en todo caso de no coincidir me devuelve un valor nulo o vacio.
-                        $consulta = $objetoAccesoDato->RetornarConsulta("SELECT m.id FROM mesa m inner join pedido p WHERE (p.codigo=:id AND m.codigo=:mesa AND p.mesa = m.id)");
-                        $consulta->bindValue(':id', $cod, PDO::PARAM_STR);
-                        $consulta->bindValue(':mesa', $mesa, PDO::PARAM_STR);
-                        $consulta->execute();
-                        $Cmesa = $consulta->fetch();
-
-                        
-                    
-                        if($v['mesa'] == $Cmesa[0]){ #verifico si la mesa coincide con el codigo
-
-                            $e = strtotime( $v['fecha'] .$v['horaFin'] );
-                            $r = strtotime($actual);
-                            $d = date("i:s", $e-$r);
-                        
-                            $t = $d ." MIN APROX";
-
-                            if(strtotime($d)== false) #si el tiempo se cumplio cambio la leyenda
-                            $t = "en proceso de entrega";
-
-                            return array('codigo'=> $cod, 'mesa'=>$mesa, 'mozo'=>$mozo, 'demora'=>$t);
-                        }
-                        else
-                            throw new Exception("LA MESA NO COINCIDE",400);
-                }
-                else
-                    throw new Exception("NO EXISTE EL CODIGO",400);
-                    
-        }
-        catch( PDOException $e){
-            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
-        }
-    }
-
-
     #ver que quise hacer aca
     public static function servirPedido($codigo){
         try{
@@ -544,6 +499,7 @@ class Pedidos {
 
     private static function CrearTicket($codigo, $mesa, $mozo, $pedido, $cantidad, $total, $hora, $fecha){
 
+        #obtengo datos para el ticket
         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
         $Cmesa = $objetoAccesoDato->RetornarConsulta("SELECT m.codigo FROM mesa m WHERE m.id=:id ");
         $Cmesa->bindValue(':id', $mesa, PDO::PARAM_INT);
@@ -557,6 +513,7 @@ class Pedidos {
         $Ccomida->bindValue(':id', $pedido, PDO::PARAM_INT);
         $Ccomida->execute();
 
+        #ejecuto las consultas
         $codMesa= $Cmesa->fetch();
         $codMozo= $Cmozo->fetch();
         $codCom= $Ccomida->fetch();

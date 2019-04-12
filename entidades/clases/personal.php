@@ -9,7 +9,6 @@ class Personal  {
 
     public static function AgregarEmpleado($usuario, $pass, $nom, $ape, $puesto){
 
-        $op = ['cost' => 12 ];
         try{
             
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 

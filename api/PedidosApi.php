@@ -142,23 +142,7 @@ class PedidosApi extends Pedidos implements IPedidos{
          }
      }
 
-    public static function VerMiPedido( $request, $response, $args){
-        
-        try{
-                $datos = $request->getParams();
-                $pedido = Pedidos::verEstadoPedido($datos['codigo'],$datos['mesa']);
-
-                if($pedido != NULL) 
-                    return $response->withJson($pedido, 200);
-                else
-                    return $response->withStatus(400);
-                    
-        }
-        catch(Exception $e){
-            return $response->withJson($e->getMessage(), 200);
-        }
-
-    }
+    
 }
 
 ?>

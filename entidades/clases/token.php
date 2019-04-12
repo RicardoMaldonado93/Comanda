@@ -18,7 +18,7 @@ class Token{
             "aud" => self::Aud(),
             "data" => $param,
             "iat" => $hora,
-            "exp" => $hora + 3600,
+            #"exp" => $hora + 3600,
             "nbf" => 1357000000
         );
         

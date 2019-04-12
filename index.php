@@ -10,6 +10,7 @@ require_once './api/PersonalApi.php';
 require_once './api/PedidosApi.php';
 require_once './api/LogApi.php';
 require_once './api/MesasApi.php';
+require_once './api/ClienteApi.php';
 require_once './entidades/clases/auth.php';
 
 $config['displayErrorDetails'] = true;
@@ -19,7 +20,10 @@ $app = new \Slim\App(["settings" => $config]);
 
 $app->post('/api/login[/]', \LoginApi::class . ':Login');
 $app->get('/api/menu[/]', \MenuApi::class . ':MostrarMenu');
-$app->get('/api/miPedido', \PedidosApi::class . ':VerMiPedido');
+$app->group('/api/cliente', function(){
+    $this->get('/miPedido[/]', \ClienteApi::class . ':VerMiPedido');
+    $this->get('/encuesta[/]', \ClienteApi::calss . ':MostrarEncuesta' );
+});
 
 $app->group('/api' , function(){
 
@@ -70,14 +74,14 @@ $app->group('/api' , function(){
         
             $this->get('[/]', \MesasApi::class . ':MostrarMesas');
             $this->get('/mayorImporte[/]', \MesasApi::class . ':MostrarMayorImporte'); #muestra 1 o mas mesas con mayor importe
-            $this->get('/mayorFacturacion[/]',\MesasApi::class . ':MostrarMayorFacturacion');
+            $this->get('/mayorFacturacion[/]',\MesasApi::class . ':MostrarMayorFacturacion'); #muestra la mesa con mayor facturacion
             $this->get('/mayorCalificacion[/]', \MesasApi::class . ':MostrarMayorCalificacion');
-            $this->get('/masUsada[/]', \MesasApi::class . ':MostrarMasUsada');
+            $this->get('/masUsada[/]', \MesasApi::class . ':MostrarMasUsada'); #muestro la mesa con mas uso
 
-            $this->get('/menorImporte[/]', \MesasApi::class . ':MostrarMenorImporte');
-            $this->get('/menorFacturacion[/]', \MesasApi::class . ':MostrarMenorFacturacion');
-            $this->get('/menorCalificacion[/]', \MesaApi::class . ':MostrarMenorCalificacion');
-            $this->get('/menosUsada[/]', \MesaApi::class . ':MostrarMenosUsada');
+            $this->get('/menorImporte[/]', \MesasApi::class . ':MostrarMenorImporte'); #muestra la mesa con el menor importe
+            $this->get('/menorFacturacion[/]', \MesasApi::class . ':MostrarMenorFacturacion'); #muestra la mesa con la menor facturacion
+            $this->get('/menorCalificacion[/]', \MesasApi::class . ':MostrarMenorCalificacion');
+            $this->get('/menosUsada[/]', \MesasApi::class . ':MostrarMenosUsada'); #muestro la mesa menos usada
         });
 
     });

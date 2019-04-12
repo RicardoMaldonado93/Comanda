@@ -110,5 +110,15 @@ class Validar{
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
+
+    public static function Puntuacion($valor){
+        if ( $valor != NULL)
+            if( $valor >=1 && $valor <=10)
+                return true;
+            else
+                throw new exception('EL VALOR INGRESADO DEBE ESTAR COMPRENDIDO ENTRE 1 y 10');
+        else
+            throw new exception('EL CAMPO NO PUEDE ESTAR VACIO');
+    }
 }
 ?>

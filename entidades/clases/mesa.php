@@ -72,7 +72,6 @@ class Mesa {
                         else
                             throw new PDOException("ERROR AL CAMBIAR ESTADO MESA");
                     
-
             }
 
             else
@@ -89,17 +88,17 @@ class Mesa {
         }
     }
 
-    public static function mayorImporte(){
+    public static function Importe($param){
         try{
         
                 $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
-                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT total, mesa.codigo FROM (SELECT total, m.id, p.mesa
+                $consulta = $objetoAccesoDato->RetornarConsulta("SELECT total, mesa.codigo as codigo_int, mesa.id as nro_mesa FROM (SELECT total, m.id, p.mesa
                                         FROM pedido p, mesa m where m.id = p.mesa) pedido, mesa where mesa.id = pedido.mesa
-                                        GROUP BY total DESC LIMIT 5");
+                                        GROUP BY total ". $param ." LIMIT 3");
 
                 if($consulta->execute()==true)
-                    return $consulta->fetch();
-                            
+                    return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+                         
         }
         catch( PDOException $e){
             return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
@@ -130,5 +129,40 @@ class Mesa {
                 return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
         }
     }*/
+
+    public static function Facturacion($param){
+        try{
+        
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT mesa, mesa.codigo AS codigo_int , total from ( SELECT mesa, SUM(total) AS total FROM pedido GROUP BY mesa) factura, mesa 
+                                                            WHERE mesa.id = mesa GROUP by total ".$param." LIMIT 1");
+
+            if($consulta->execute()==true)
+                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+                     
+        }
+        catch( PDOException $e){
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
+        }
+
+    }
+
+    public static function Uso($param){
+        try{
+
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT mesa.codigo as codigo_int,mesa
+                                                                FROM  (SELECT mesa, COUNT(mesa) uso from pedido GROUP BY mesa
+                                                                ORDER BY uso ".$param." limit 1) uso, mesa 
+                                                                where mesa.id = mesa");
+
+            if($consulta->execute()==true)
+                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+                     
+        }
+        catch( PDOException $e){
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
+        }
+    }
 }
 ?>
