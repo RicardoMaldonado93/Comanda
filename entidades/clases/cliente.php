@@ -9,7 +9,7 @@ class Cliente{
         
         try{
             
-            if(Validar::ExisteCodigo($cod) != NULL){
+            if( $existe = Validar::ExisteCodigo($cod)){
                 if( Validar::Puntuacion($calMe) && Validar::Puntuacion($calR) && Validar::Puntuacion($calMo) && Validar::Puntuacion($calC) ){
                     $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
                     $consulta = $objetoAccesoDato->RetornarConsulta("INSERT INTO encuesta(codigo,calMesa,calResto,calMozo,calCocinero, opinion) VALUES ( :cod, :me, :res, :mo, :co, :op)");
@@ -18,22 +18,24 @@ class Cliente{
                     $consulta->bindValue(':res', $calR, PDO::PARAM_INT);
                     $consulta->bindValue(':mo', $calMo, PDO::PARAM_INT);
                     $consulta->bindValue(':co', $calC, PDO::PARAM_INT);
-                    $consulta->bindValue(':op', $ope, PDO::PARAM_STR);
+                    $consulta->bindValue(':op', $opi, PDO::PARAM_STR);
 
                     if($consulta->execute()==true)
                         return array('msg'=>"GRACIAS POR COMPLETAR LA ENCUESTA", 'type'=>'ok');
                     
                     else
-                    throw new PDOException("ERROR AL AGREGAR LA ENCUESTA");
+                        throw new PDOException("ERROR AL AGREGAR LA ENCUESTA");
                 }
             }
-            else{
-                throw new PDOExcetion("EL CODIGO NO EXISTE");
-            }
+            if( $existe == 0)
+                throw new PDOException("EL CODIGO NO EXISTE");
                 
         }
         catch( PDOException $e){
-            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
+            if($e->getCode()=='23000')
+                return array('msg'=>strtoupper('usted ya ha realizado la encuesta'), 'type'=>'error');
+            else
+                return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');
         }
 
     }

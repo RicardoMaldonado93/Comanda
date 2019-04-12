@@ -39,7 +39,24 @@ class Validar{
             $verificar->bindValue(':id', $codigo, PDO::PARAM_INT);
             $verificar->execute();
             
-            return $verificar->fetch();
+            return $verificar->fetchAll(PDO::FETCH_CLASS, 'validar');
+        }
+        catch(PDOException $e){
+            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
+        }
+    }
+
+    public static function ExisteCodigo($codigo){
+        try{
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
+            $verificar= $objetoAccesoDato->RetornarConsulta("SELECT COUNT(codigo) FROM pedido WHERE codigo= :id");
+            $verificar->bindValue(':id', $codigo, PDO::PARAM_STR);
+            $verificar->execute();
+
+            if(  intval($verificar->fetchColumn()) != 0)
+                return true;
+            else
+                return false;
         }
         catch(PDOException $e){
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
@@ -110,15 +127,16 @@ class Validar{
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
         }
     }
+    
 
     public static function Puntuacion($valor){
-        if ( $valor != NULL)
-            if( $valor >=1 && $valor <=10)
-                return true;
+            if ( $valor != NULL)
+                if( $valor >=1 && $valor <=10)
+                    return true;
+                else
+                    throw new PDOException('el valor ingresado debe estar comprendido entre 1 y 10');
             else
-                throw new exception('EL VALOR INGRESADO DEBE ESTAR COMPRENDIDO ENTRE 1 y 10');
-        else
-            throw new exception('EL CAMPO NO PUEDE ESTAR VACIO');
+                throw new PDOException('ningun campo puede quedar vacio');
     }
 }
 ?>

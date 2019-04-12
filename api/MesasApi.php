@@ -77,6 +77,24 @@ class MesasApi extends Mesa implements IMesas{
             return $reponse->withJson($mesa, 400);
     }
 
+    public static function MostrarMayorCalificacion($request, $response, $args){
+        $mayorCalificacion = Mesa::Calificacion('DESC');
+
+        if($mayorCalificacion != NULL)
+            return $response->withJson($mayorCalificacion, 200);
+        else
+            return $response->withJson($mayorCalificacion,400);
+    }
+
+    public static function MostrarMenorCalificacion($request, $response, $args){
+        $menorCalificacion = Mesa::Calificacion('ASC');
+
+        if($menorCalificacion != NULL)
+            return $response->withJson($menorCalificacion, 200);
+        else
+            return $response->withJson($menorCalificacion,400);
+    }
+
     public static function MostrarMesas($request, $response, $args){
 
         $lista = Mesa::verMesas();

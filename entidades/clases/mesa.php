@@ -164,5 +164,22 @@ class Mesa {
             return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
         }
     }
+
+    public static function Calificacion($param){
+        try{
+
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT pedido.mesa, calMesa, opinion FROM (SELECT pedido.mesa, calMesa, opinion FROM encuesta, pedido 
+                                                            WHERE encuesta.codigo = pedido.codigo GROUP BY encuesta.codigo) encuesta, pedido  
+                                                            GROUP BY calMesa ". $param ." limit 1");
+
+            if($consulta->execute()==true)
+                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Mesa');
+                     
+        }
+        catch( PDOException $e){
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error') ; 
+        }
+    }
 }
 ?>

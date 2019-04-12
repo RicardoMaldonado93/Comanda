@@ -46,7 +46,7 @@ class Token{
             
 
             if ( $decodificado ->aud  !==  self :: Aud ()){
-                throw  new  excepcion ( " No es el usuario valido " );
+                throw  new  Exception ( " No es el usuario valido " );
             }
             
             else

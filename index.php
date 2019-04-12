@@ -22,7 +22,7 @@ $app->post('/api/login[/]', \LoginApi::class . ':Login');
 $app->get('/api/menu[/]', \MenuApi::class . ':MostrarMenu');
 $app->group('/api/cliente', function(){
     $this->get('/miPedido[/]', \ClienteApi::class . ':VerMiPedido');
-    $this->get('/encuesta[/]', \ClienteApi::calss . ':MostrarEncuesta' );
+    $this->get('/encuesta[/]', \ClienteApi::class . ':MostrarEncuesta' );
 });
 
 $app->group('/api' , function(){
@@ -75,12 +75,12 @@ $app->group('/api' , function(){
             $this->get('[/]', \MesasApi::class . ':MostrarMesas');
             $this->get('/mayorImporte[/]', \MesasApi::class . ':MostrarMayorImporte'); #muestra 1 o mas mesas con mayor importe
             $this->get('/mayorFacturacion[/]',\MesasApi::class . ':MostrarMayorFacturacion'); #muestra la mesa con mayor facturacion
-            $this->get('/mayorCalificacion[/]', \MesasApi::class . ':MostrarMayorCalificacion');
+            $this->get('/mayorCalificacion[/]', \MesasApi::class . ':MostrarMayorCalificacion'); #muestra la mesa con la mayor calificacion
             $this->get('/masUsada[/]', \MesasApi::class . ':MostrarMasUsada'); #muestro la mesa con mas uso
 
             $this->get('/menorImporte[/]', \MesasApi::class . ':MostrarMenorImporte'); #muestra la mesa con el menor importe
             $this->get('/menorFacturacion[/]', \MesasApi::class . ':MostrarMenorFacturacion'); #muestra la mesa con la menor facturacion
-            $this->get('/menorCalificacion[/]', \MesasApi::class . ':MostrarMenorCalificacion');
+            $this->get('/menorCalificacion[/]', \MesasApi::class . ':MostrarMenorCalificacion'); #muestra la mesa con la menor calificacion
             $this->get('/menosUsada[/]', \MesasApi::class . ':MostrarMenosUsada'); #muestro la mesa menos usada
         });
 

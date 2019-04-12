@@ -18,13 +18,24 @@ class ClienteApi extends Cliente implements ICliente{
                     
         }
         catch(Exception $e){
-            return $response->withJson($e->getMessage(), 200);
+            return $response->withJson($e->getMessage(), 400);
         }
 
     }
 
-    public static function MostrarEncuesta( $request, $response, $args){
-        
+    public static function MostrarEncuesta($request, $response, $args){
+        try{
+            $datos = $request->getParsedBody();
+            $encuesta = Cliente::Encuesta($datos['codigo'],$datos['calMesa'], $datos['calResto'], $datos['calMozo'], $datos['calCocinero'], $datos['opinion']);
+
+            if( $encuesta != NULL)
+                return $response->withJson($encuesta, 200);
+            else 
+                return $response->withJson($encuesta, 400);
+        }
+        catch(Exception $e){
+            return $response->withJson($e->getMessage(),400);
+        }
     }
 }
 ?>
