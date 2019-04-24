@@ -43,7 +43,7 @@ $app->group('/api' , function(){
         $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
         $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
 
-    })->add(\MWAuth::class . ':Auth');
+    })->add(\MWAuth::class . ':Admin');
 
     $this->group('/pedido', function(){
 
@@ -84,7 +84,7 @@ $app->group('/api' , function(){
             $this->get('/menosUsada[/]', \MesasApi::class . ':MostrarMenosUsada'); #muestro la mesa menos usada
         });
 
-    });
+    })->add(\MWAuth::class . ':Admin');
 
 })->add(\LogApi::class . ':Registro');
 

@@ -89,7 +89,10 @@ class Validar{
         $verificar->bindValue(':param', $param, PDO::PARAM_STR);
         $verificar->execute();
         
-        return $verificar->fetchAll();
+        if($verificar->fetchAll() == NULL)
+            return false;
+        else
+            return true;
     }
 
     public static function ExistePedido($codigo){

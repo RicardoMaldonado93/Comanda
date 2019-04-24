@@ -8,7 +8,7 @@ class Login {
     public static function loguear($usuario, $pass){
         try{
               
-            if( Validar::verificar('usuario','personal',$usuario) != NULL){
+            if( Validar::verificar('usuario','personal',$usuario)){ #verificar la funcionalidad
                         $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso();
                         $con= $objetoAccesoDato->RetornarConsulta("SELECT pass FROM personal where usuario = :usuario");
                         $con->bindValue(':usuario', $usuario, PDO::PARAM_STR);

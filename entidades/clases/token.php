@@ -29,46 +29,25 @@ class Token{
     
     public static function VerificarToken($token)
     {
-    
-        if(empty($token))
-        {   
-            throw new Exception("El token esta vacio.");
-        } 
+            if(empty($token) )
+                throw new Exception('EL TOKEN SE ENCUENTRA VACIO');
+        
+                
+                $decodificado = JWT::decode(  
+                                                $token, 
+                                                self::$key, 
+                                                self::$tipoEncriptacion
+                                            );
+                
 
+                if ( $decodificado ->aud  !==  self :: Aud ()){
+                    throw  new  Exception ( " USUARIO NO VALIDO " );
+                }
+                
       
-      try {
-
-            $decodificado = JWT::decode(  
-                                            $token, 
-                                            self::$key, 
-                                            self::$tipoEncriptacion
-                                        );
-            
-
-            if ( $decodificado ->aud  !==  self :: Aud ()){
-                throw  new  Exception ( " No es el usuario valido " );
-            }
-            
-            else
-                return true;
-             
-        } catch (Exception $e) {
-            
-            throw new Exception(strtoupper($e->getMessage()));
-    
-        } 
-       
     }
-    
+
    
-     public static function ObtenerPayLoad($token)
-    {
-        return JWT::decode(
-            $token,
-            self::$key,
-            self::$tipoEncriptacion
-        );
-    }
      public static function ObtenerData($token)
     {
         return JWT::decode(
