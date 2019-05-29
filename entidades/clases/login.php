@@ -25,9 +25,16 @@ class Login {
                         throw new PDOException("password invalido!");
                 }
             else
-                throw new PDOException("usuario no existente!");        
+                throw new PDOException("usuario no existe!");        
             }
         catch (PDOException $e){
+
+            if($e->getMessage()=='password invalido!')
+                return array('msg'=>strtoupper($e->getMessage()), 'type'=>'errorPassword');
+
+            if($e->getMessage()=='usuario no existe!')
+                return array('msg'=>strtoupper($e->getMessage()), 'type'=>'errorUsuario');
+
             return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
         }
     }

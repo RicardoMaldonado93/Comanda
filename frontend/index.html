@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <!--Bootstrap-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+   
+    <link rel="stylesheet" type="text/css" href="css/style.css" >
+    <link rel='stylesheet' type='text/css' href='css/font.css'>
+    <script src='js/script.js'></script>
+    <script src="js/jssor.slider-27.5.0.min.js"></script>
+    
+    <!--font-->
+    <link href='https://fonts.googleapis.com/css?family=Cookie' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Sancreek' rel='stylesheet' type='text/css'>
+
+    <title>Resto Bon Appetit</title>
+</head>
+<body class="container-fluid bg">
+        
+    <section class="row-1" id='capa1'>
+                <nav class="navbar shift navbar-expand-lg navbar-dark bg-dark justify-content-sm-start fixed-top">
+                        
+                    <a class="navbar-brand order-0 order-lg-0 ml-lg-0 mr-2 ml-auto" href="#">Bon Appetit Resto</a>
+                    
+                    <button class="navbar-toggler align-self-start" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    
+                    <div 
+                        class="collapse navbar-collapse d-flex flex-column flex-lg-row flex-xl-row justify-content-lg-end bg-dark p-3
+                            p-lg-0 mt-5 mt-lg-0 mobileMenu onRight" 
+                            id="navbarTogglerDemo03">
+
+                        <ul class="navbar-nav align-self-stretch " :hover >
+                        <li class="nav-item  ">
+                            <a class="nav-link" href="#">Inicio <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="#">Mi pedido</a>
+                        </li>
+                        
+                        <li class="nav-item ">
+                                <a class="nav-link " href="#">Menu</a>
+                        </li> 
+
+                        <li class="nav-item ">
+                            <a class="nav-link " href="#">Login</a>
+                        </li>
+                        
+                        </ul>
+                    </div>
+                </nav>
+            <div class='overlay'> </div>
+    </section>
+
+    <section class='row' style="border:2px solid red; position: relative; top:60px;">      
+        <div id="jssor_1" style="margin:0 auto;top:30px;left:0px;width:1300px;height:500px;overflow:hidden;visibility:hidden;">
+            <!-- Loading Screen -->
+            <div data-u="slides" style="cursor:default;position:relative;top:0px;left:0px;width:1300px;height:500px;overflow:hidden;">
+                <div>
+                    <img data-u="image" src="resource/background.jpeg" />
+                </div>
+                <div>
+                    <img data-u="image" src="resource/background2.jpeg" />
+                </div>
+                <div>
+                    <img data-u="image" src="resource/background3.jpeg" />
+                                                
+                </div>
+            </div>
+            <!-- Bullet Navigator -->
+            <div data-u="navigator" class="jssorb032" style="position:absolute;bottom:12px;right:12px;" data-autocenter="1" data-scale="0.5" data-scale-bottom="0.75">
+                <div data-u="prototype" class="i" style="width:16px;height:16px;">
+                    <svg viewbox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                        <circle class="b" cx="8000" cy="8000" r="5800"></circle>
+                    </svg>
+                </div>
+            </div>
+            <!-- Arrow Navigator -->
+            <div data-u="arrowleft" class="jssora051" style="width:65px;height:65px;top:0px;left:25px;" data-autocenter="2" data-scale="0.75" data-scale-left="0.75">
+                <svg viewbox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                    <polyline class="a" points="11040,1920 4960,8000 11040,14080 "></polyline>
+                </svg>
+            </div>
+            <div data-u="arrowright" class="jssora051" style="width:65px;height:65px;top:0px;right:25px;" data-autocenter="2" data-scale="0.75" data-scale-right="0.75">
+                <svg viewbox="0 0 16000 16000" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                    <polyline class="a" points="4960,1920 11040,8000 4960,14080 "></polyline>
+                </svg>
+            </div>
+        </div>
+      
+    </section>
+    
+    <section class="row" style="border: 2px solid forestgreen; position: relative; top:65px; ">
+            <div class="wrap" s>
+                <div class="newsletter-bg"></div>  
+                <div class="newsletter-text">
+                        <h2>Nosotros!</h2>
+                        <p>
+                                En pareja, con amigos o familiares, Bon Appetit es el lugar ideal para pasar un momento agradable en torno a una buena comida servida de una manera sencilla y amigable.
+                                ¡Nuestro chef realiza nuestros platos caseros con productos frescos y vuelve a visitar la cocina bistró diaria para su disfrute!
+                                ¡Déjate tentar por nuestra generosa cocina que hará las delicias de los más hambrientos!
+                                ¡Hasta pronto en Bon Appetit!  </p>
+                </div>
+            
+            </div>
+          
+    <section id='maps'></section>
+    </div>
+    <footer id="lab_social_icon_footer">
+
+            <div class="text-center center-block ">
+                <a href="https://www.facebook.com/bootsnipp "><i id="social-fb " class="fa fa-facebook-square fa-3x social "></i></a>
+                <a href="https://twitter.com/bootsnipp "><i id="social-tw " class="fa fa-twitter-square fa-3x social "></i></a>
+                <a href="https://plus.google.com/+Bootsnipp-page "><i id="social-gp " class="fa fa-google-plus-square fa-3x social "></i></a>
+                <a href="mailto:# "><i id="social-em " class="fa fa-envelope-square fa-3x social "></i></a>
+            </div>
+        </footer>
+</body>
+</html>
