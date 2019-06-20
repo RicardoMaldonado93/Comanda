@@ -35,16 +35,32 @@
                                     'controlador': controlador,
                                     'carga': carga,
                               }
+                return this;
             } ,
 
             manejadorRutas: function(){
+                var hash = window.location.hash.substring(1) || '/',
+                    destino = rutas[hash],
+                    xhr = new XMLHttpRequest();
 
+                if( destino && destino.plantilla ){
+                    xhr.addEventListener('load', function(){
+                        marco.innerHtml = this.responseText;
+                    }, false);
+
+                    xhr.open('get', destino.plantilla, true)
+                    xhr.send(null);
+                }
+                else{
+                    window.location.hash = '#/';
+                }
             }
         };
         return libreria;
     }
     if(typeof window.libreria === 'undefined'){
         window.libreria = window._ = inicio();
+        window.addEventListener('load', _.manejadorRutas, false);
         window.addEventListener('hashchange', _.manejadorRutas, false);
     }
     else{
