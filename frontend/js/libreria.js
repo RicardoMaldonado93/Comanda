@@ -45,7 +45,7 @@
 
                 if( destino && destino.plantilla ){
                     xhr.addEventListener('load', function(){
-                        marco.innerHtml = this.responseText;
+                        marco.innerHTML = this.responseText;
                     }, false);
 
                     xhr.open('get', destino.plantilla, true)
