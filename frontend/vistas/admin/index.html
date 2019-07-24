@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src='../../js/funciones.js' ></script>
+    <title>Admin</title>
+</head>
+<body class='container-fluid'  >
+        <ul class="nav nav-tabs" style='margin-top: 75px'>
+                <li class="nav-item">
+                        <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Empleados</a>
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item" data-toggle="tab" href="#menu3">Alta</a>
+                                  <a class="dropdown-item " data-toggle="tab" href="#menu2">Baja</a>
+                                  <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Modificacion</a>
+                                  <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Eliminar</a>
+                                  <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Listar</a>
+                                </div>
+                        </li>
+                </li>
+                <li class="nav-item">
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Pedidos</a>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" data-toggle="tab" href="#menu3">Tomar Pedido</a>
+                      <a class="dropdown-item " data-toggle="tab" href="#menu2">Preparar</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="#menu1">Cancelar</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Servir</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Entregar</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Agregar a pedido</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mostrar un pedido</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mostrar pedidos</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mostrar por estado</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mostrar por sector</a> 
+                    </div>
+                  </li>
+                </li>
+
+                <li class="nav-item">
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Mesa</a>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" data-toggle="tab" href="#menu3">Agregar Mesa</a>
+                      <a class="dropdown-item " data-toggle="tab" href="#menu2">Modificar Mesa</a>
+                      <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Eliminar Mesa</a>
+
+                      
+                          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">Listados</a>
+                          <div class="dropdown-menu">
+                            <a class="dropdown-item" data-toggle="tab" href="">Mostrar Mesas</a>
+                            <a class="dropdown-item" data-toggle="tab" href="#menu3">Mayor importe</a>
+                            <a class="dropdown-item " data-toggle="tab" href="#menu2">Mayor facturacion</a>
+                            <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mayor calificacion</a>
+                            <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Mas usada</a>
+                            <a class="dropdown-item" data-toggle="tab" href="#menu3">Menor importe</a>
+                            <a class="dropdown-item " data-toggle="tab" href="#menu2">Menor facturacion</a>
+                            <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Menor calificacion</a>
+                            <a class="dropdown-item" data-toggle="tab"  href="http://google.com.ar">Menos usada</a>
+                          </div>
+                       
+                    </div>
+                  </li>
+                </li>
+              </ul>
+              
+            
+              <!-- Tab panes -->
+              <div class="tab-content">
+                <div class="tab-pane container fade" id="menu3"> <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed in volutpat ex, ut blandit dui. Cras pharetra sapien vitae metus interdum pretium. Suspendisse at varius nunc. Morbi eleifend elit magna, a rhoncus justo tristique ac. Nulla facilisi. Sed pretium blandit lorem, sed condimentum velit consequat vel. Suspendisse hendrerit lorem vulputate suscipit tincidunt. Duis nec pulvinar arcu. Cras ut accumsan erat. Curabitur ut urna eu diam tempus aliquet. Cras vehicula ex non neque faucibus, nec ullamcorper arcu congue. Donec mattis lectus scelerisque, tempor lacus sit amet, consequat eros.
+                
+                Maecenas ornare sed nulla eget rhoncus. Morbi eget sagittis orci. Praesent varius orci quis ex pharetra pharetra. Mauris non tincidunt odio, congue malesuada libero. Nulla in risus interdum, sagittis orci sed, iaculis tellus. Duis nisi turpis, elementum ut risus id, commodo faucibus felis. Morbi ac purus et lectus maximus placerat. Donec aliquet lectus sed sapien auctor, pharetra aliquam dui mattis. Maecenas urna velit, placerat a metus ut, ullamcorper convallis lorem. Quisque vitae nunc consectetur, tempor mi in, porttitor risus. In pulvinar cursus sapien, quis consequat sem pretium vel. Nullam quis urna dui.
+                
+                Curabitur id dolor vel massa blandit malesuada. Sed ornare dolor non nisl iaculis fringilla. Praesent risus ex, tincidunt in odio non, pretium lacinia mi. Maecenas fermentum enim ante, nec bibendum massa hendrerit ac. Vivamus pretium mollis nisi, ac cursus justo tempor a. Nam vestibulum, magna quis consequat tristique, orci enim pretium velit, vitae vestibulum diam orci vel diam. Proin lacus nulla, tempus sit amet justo ut, convallis rutrum urna. Curabitur id nisi libero. Aliquam auctor id tellus ut hendrerit. Donec ut mauris massa. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer consectetur turpis nisi. Donec fermentum convallis odio, sit amet dignissim nisi. Sed sit amet tristique mi, a rutrum erat.
+                
+                Duis vel nisl ac mauris tristique ultrices ac et ligula. Aliquam erat volutpat. Pellentesque ac tempus nisl. Praesent viverra quis augue eu hendrerit. Donec vel mauris non libero hendrerit pellentesque. Integer placerat, risus eu vestibulum facilisis, nisl lectus vehicula risus, ut viverra justo dui sed diam. Fusce sit amet felis tortor. Integer a risus mollis orci pellentesque rhoncus. Nunc nec semper metus, mollis dignissim libero. Sed vel faucibus mi.
+                    </p></div>
+                <div class="tab-pane container fade" id="menu1">menu1</div>
+                <div class="tab-pane container fade" id="menu2">...</div>
+              </div>
+              
+   
+</body>
+</html>
