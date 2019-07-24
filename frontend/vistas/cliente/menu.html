@@ -3,28 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"> 
     <title>Document</title>
 </head>
 <body class="container-fluid">
-        <div id= 'tabla' class='col-md-8 col-sm-12'>
+        <div class='col-md-8 col-sm-12 col-xl-12'>
                 <div class='card mb-3'>  
                     <div class='card-header'>
                         <h3 class='card-title text-center'>Menu</h3>
                     </div>
                     
-                    <table class="table-ligth table-striped text-center">
-                        <thead class='thead-dark'>
-                            <tr>
-                                <th>NOMBRE</th>
-                                <th>PRECIO</th>                               
-                            </tr>
-                        </thead>
-                        <tbody id='tbody'>
-                           
-                        </tbody>
-                    </table>
+                    <div class='card-body row'>
+
+                        <!--TABLA COMIDAS-->
+                            <div class='col-xl-4'>
+                                <table class="table-ligth table " id='tabla0'>     
+                                    <thead class='thead-dark text-center'>
+                                        <tr>
+                                            <th colspan="2" >COMIDAS</th>
+                                        </tr>
+                                        <tr class='thead-light'>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='tbody0' class="text-center"></tbody>
+                                </table>
+                            </div>
+
+                        <!--TABLA POSTRES-->
+                        <div class='col-xl-4'>
+                                <table class="table-ligth table " id='tabla1'>     
+                                    <thead class='thead-dark text-center'>
+                                        <tr>
+                                            <th colspan="2" >POSTRES</th>
+                                        </tr>
+                                        <tr class='thead-light'>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='tbody1' class="text-center"></tbody>
+                                </table>
+                            </div>
+
+
+                        <!--TABLA BEBIDAS-->
+                        <div class='col-xl-4'>
+                                <table class="table-ligth table " id='tabla2'>     
+                                    <thead class='thead-dark text-center'>
+                                        <tr>
+                                            <th colspan="2" >BEBIDAS</th>
+                                        </tr>
+                                        <tr class='thead-light'>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='tbody2' class="text-center"></tbody>
+                                </table>
+                            </div>
+
+                    </div>
                 </div>
-            </div>
+        </div>
+
+        
 </body>
 </html>
