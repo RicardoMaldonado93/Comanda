@@ -82,7 +82,25 @@ rutas = {
     },
 
     'admin':{
-        'plantilla': 'vistas/admin/index.html',
+        'plantilla': 'vistas/empleado/admin.html',
+        'controlador': 'admin',
+        'carga': null
+    },
+
+    'bartender':{
+        'plantilla': 'vistas/empleado/bartender.html',
+        'controlador': 'admin',
+        'carga': null
+    },
+
+    'mozo':{
+        'plantilla': 'vistas/empleado/mozo.html',
+        'controlador': 'admin',
+        'carga': null
+    },
+
+    'cocinero':{
+        'plantilla': 'vistas/empleado/cocinero.html',
         'controlador': 'admin',
         'carga': null
     }

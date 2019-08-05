@@ -264,5 +264,22 @@ class Personal  {
         }
     }
 
+    public static function MostrarRegistros(){
+        try{
+
+            $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 
+            $consulta = $objetoAccesoDato->RetornarConsulta("SELECT * FROM registro");
+            
+
+            if($consulta->execute()==true)
+                return $consulta->fetchAll(PDO::FETCH_CLASS, 'Personal');
+            else
+                throw new PDOException("ERROR AL MOSTRAR LOS REGISTROS");
+        }
+        catch( PDOException $e){
+
+            return  array('msg'=>strtoupper($e->getMessage()), 'type'=>'error'); 
+        }
+    }
 }
 ?>
