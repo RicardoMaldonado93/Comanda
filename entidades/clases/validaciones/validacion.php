@@ -109,7 +109,7 @@ class Validar{
                     $consulta->bindValue(':cod', $codigo, PDO::PARAM_STR);
                     
                     if($consulta->execute()==true)
-                        return $consulta->fetchAll(PDO::FETCH_CLASS, 'Validar'); #si encuentra el registro devuelve los datos del registro
+                        return 1; #si encuentra el registro devuelve los datos del registro
             }
                 
             else{
@@ -120,14 +120,14 @@ class Validar{
                         $band = 0;
                     else
                         $band = -1;*/
-                       return null;
+                       return -1;
                 }
                
             //}
             //return $band;
         }
         catch(PDOException $e){
-            return array('msg'=>strtoupper($e->getMessage()), 'type'=>'error');  
+            return array('msg'=>strtoupper($e->getMessage() + var_dump($codigo)), 'type'=>'error');  
         }
     }
     

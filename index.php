@@ -1,44 +1,44 @@
 <?php
 
+require_once './composer/vendor/autoload.php';
+require_once './API/LoginApi.php';
+require_once './API/MenuApi.php';
+require_once './API/PersonalApi.php';
+require_once './API/PedidosApi.php';
+require_once './API/LogApi.php';
+require_once './API/MesasApi.php';
+require_once './API/ClienteApi.php';
+require_once './API/ArchivosApi.php';
+require_once './entidades/clases/auth.php';
+
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-#region Declaracion de archivos a utilizar
-require_once './composer/vendor/autoload.php';
-require_once './api/LoginApi.php';
-require_once './api/MenuApi.php';
-require_once './api/PersonalApi.php';
-require_once './api/PedidosApi.php';
-require_once './api/LogApi.php';
-require_once './api/MesasApi.php';
-require_once './api/ClienteApi.php';
-require_once './api/ArchivosApi.php';
-require_once './entidades/clases/auth.php';
-#endregion
 
-#region Configuracion de la API
 $config['displayErrorDetails'] = true;
-$config['addContentLengthHeader'] = true;
-#endregion
+$config['addContentLengthHeader'] = false;
+
 
 $app = new \Slim\App(["settings" => $config]);
 
 $app->post('/api/login[/]', \LoginApi::class . ':Login');
 $app->get('/api/menu[/]', \MenuApi::class . ':MostrarMenu');
-$app->get('/api/menu/exportar',\ ArchivosApi::class . ':ExportarDatos');
+$app->get('/api/log/exportar', \ArchivosApi::class .':ExportarLog')->add(\MWAuth::class . ':Admin');
+$app->get('/api/menu/exportar',\ ArchivosApi::class . ':ExportarMenu');
+
 $app->group('/api/cliente', function(){
     $this->get('/miPedido[/]', \ClienteApi::class . ':VerMiPedido');
     $this->get('/encuesta[/]', \ClienteApi::class . ':MostrarEncuesta' );
 });
 
 $app->group('/api' , function(){
-    #region Empleados
-        $this->group('/empleado', function(){
+    
+    $this->group('/empleado', function(){
 
             $this->get('/registro[/]', \PersonalApi::class . ':MostrarRegistros');
-            $this->get('/registros/exportar', \ArchivosApi::class . ':ExportarDatos');
+            $this->get('/registro/exportar', \ArchivosApi::class . ':ExportarRegistros');
             //ABM de empleados
-            $this->post('[/]', \PersonalApi::class . ':Agregar')->add(\MWAuth::class . ':VerificarUsuario');
+            $this->post('[/]', \PersonalApi::class . ':Agregar');
             $this->delete('[/]', \PersonalApi::class . ':Eliminar');
             $this->put('[/]', \PersonalApi::class . ':Modificar');
 
@@ -52,12 +52,10 @@ $app->group('/api' , function(){
             $this->put('/cambiarEstado[/]', \PersonalApi::class . ':CambiarEstado');
             $this->put('/cambiarPuesto[/]', \PersonalApi::class . ':CambiarPuesto');
 
-           
-    #endregion
 
     })->add(\MWAuth::class . ':Admin');
 
-    #region Pedidos
+ 
         $this->group('/pedido', function(){
 
             //Operaciones con pedidos
@@ -70,14 +68,15 @@ $app->group('/api' , function(){
             $this->put('/agregar[/]', \PedidosApi::class . ':AgregarAPedido');
 
             //Listados de pedidos gral y por sector
+           // $this->get('/exportar', \ArchivosApi::class . ':ExportarPedidos');
             $this->get('/{id}', \PedidosApi::class . ':MostrarPedido');
             $this->get('[/]', \PedidosApi::class . ':MostrarPedidos');
             $this->get('/estado/{es}[/]', \PedidosApi::class . ':MostrarEstado');
             $this->get('/sector/{se}[/]', \PedidosApi::class . ':MostrarSector');
-    #endregion
+           
     })->add(\MWAuth::class . ':Auth');
 
-    #region Mesa
+   
         $this->group('/mesa', function(){
 
             $this->post('[/]', \MesasApi::class . ':AgregarMesa');
@@ -97,7 +96,8 @@ $app->group('/api' , function(){
                 $this->get('/menorCalificacion[/]', \MesasApi::class . ':MostrarMenorCalificacion'); #muestra la mesa con la menor calificacion
                 $this->get('/menosUsada[/]', \MesasApi::class . ':MostrarMenosUsada'); #muestro la mesa menos usada
             });
-    #endregion
+            $this->get('/exportar[/]' , \ArchivosApi::class . ':ExportarMesas');
+
     })->add(\MWAuth::class . ':Admin');
 
 })->add(\LogApi::class . ':Registro');

@@ -264,7 +264,7 @@ class Personal  {
         }
     }
 
-    public static function MostrarRegistros(){
+    public static function MostrarLogs(){
         try{
 
             $objetoAccesoDato = AccesoDatos::dameUnObjetoAcceso(); 

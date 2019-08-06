@@ -1,6 +1,6 @@
 <?php
 
-require_once './entidades/clases/Token.php';
+require_once './entidades/clases/token.php';
 
 class MWAuth
 {
@@ -76,33 +76,27 @@ class MWAuth
 
     public static function Auth( $request, $response, $next){
 
-        try{
+		try{
+			$token = $request->getHeader('token');
+			$status = Token::VerificarToken($token[0]);
+			$payload = Token::ObtenerData($token[0]);
 
-            $token = $request->getHeader('token');
-            $status = Token::VerificarToken($token[0]);
-			
-                if( $status ){
+			if(strtolower($payload[0]->{'estado'}) != 'suspendido' and strtolower($payload[0]->{'estado'}) != 'inactivo'){
+				return $next($request,$response);
+			}
+			else
+			{
+				if(strtolower($payload[0]->{'estado'}) == 'suspendido')
+					return $response->withJson(array('msg'=>'SU CUENTA SE ENCUENTRA SUSPENDIDA, COMUNIQUESE CON EL ADMINISTRADOR','type'=>'error'),401);
+				else
+					return $response->withJson(array('msg'=>'SU CUENTA SE ENCUENTRA INACTIVA, COMUNIQUESE CON EL ADMINISTRADOR','type'=>'error'),401);
+			}
 
-                    $payload =Token::ObtenerData($token[0]);
-
-                    if(strtolower($payload[0]->{'estado'}) != 'suspendido' and strtolower($payload[0]->{'estado'}) != 'inactivo')
-							
-						return $next($request,$response);
-
-                    else
-                    {
-                        if(strtolower($payload[0]->{'estado'}) == 'suspendido')
-                            return $response->withJson(array('msg'=>'SU CUENTA SE ENCUENTRA SUSPENDIDA, COMUNIQUESE CON EL ADMINISTRADOR','type'=>'error'),401);
-                        else
-                            return $response->withJson(array('msg'=>'SU CUENTA SE ENCUENTRA INACTIVA, COMUNIQUESE CON EL ADMINISTRADOR', 'type'=>'error'),401);
-                    }
-                }
-                
-        }
-        catch( Exception $e){
-            return $response->withJson($e->getMessage(),401);
-        }
-	}
+			}
+			catch( Exception $e){
+				return $response->withJson($e->getMessage(),401);
+			}
+		}
 	
 	public static function Admin( $request, $response, $next){
 

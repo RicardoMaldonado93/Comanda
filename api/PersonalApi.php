@@ -96,7 +96,7 @@ class PersonalApi extends Personal implements IPersonal{
 
     public static function MostrarRegistros($request, $response, $args){
        
-        $registros = Personal::MostrarRegistros();
+        $registros = Personal::MostrarLogs();
 
         if($registros != NULL)
             return $response->withJson($registros, 200);
