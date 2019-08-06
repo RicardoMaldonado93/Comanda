@@ -1,24 +1,20 @@
 <?php
-    require_once './entidades/clases/archivos/archivos.php';
-    require_once './entidades/clases/archivos/FPDF/fpdf.php';
+    require_once './entidades/clases/archivos/armarPDF.php';
 
     class ArchivosApi{
 
         public static function ExportarDatos($request, $response, $args){
 
-            $header = ['ID', 'usuario', 'nombre', 'apellido', 'puesto','estado'];
-            $data = Personal::Mostrar();
+            $header = ['ID', 'usuario', 'metodo', 'ruta', 'fecha'];
+            $data = Personal::MostrarRegistros();
         
 
             //var_dump(get_object_vars( Personal::MostrarRegistros()));
 
-            $archivo =  PDF::LoadData($header, $data);
+            $archivo = PDF::CrearPDF($header,$data,33, 33,'Registros');
             
-            if($archivo != Null){
+            if($archivo != Null)
                 return $response;
-		
-		return $response;
-            }
             else
                 return $response->withJson(400);
         }
